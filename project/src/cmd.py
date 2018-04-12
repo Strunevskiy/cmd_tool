@@ -2,9 +2,10 @@ import logging
 from cmd import Cmd
 
 from project.src.base.entity import POSITION, Order, Beverage, Ingredient
+from project.src.db import DataSource
 from project.src.exporter import ConsoleExporter, SpreadSheetExporter
-from project.src.repository import BeverageRepository, IngredientRepository
 from project.src.service import ReportService, OrderService
+from project.src.store.dao import BeverageDao, IngredientDao, DaoManager
 
 
 class BasePrompt(Cmd):
@@ -12,9 +13,14 @@ class BasePrompt(Cmd):
     def __init__(self, user):
         super().__init__()
         self._user = user
+        self._data_source = DataSource()
+        self._dao_manager = DaoManager(self._data_source)
 
     def get_user(self):
         return self._user
+
+    def get_dao_manager(self):
+        return self._dao_manager
 
     def do_quit(self, args):
         raise SystemExit
@@ -30,22 +36,20 @@ class BasePrompt(Cmd):
 
 
 class SalesmanPrompt(BasePrompt):
-
     _log = logging.getLogger()
 
     def __init__(self, user):
         super().__init__(user)
-        self._order_service = OrderService()
-        self._beverage_repository = BeverageRepository()
-        self._ingredient_repository = IngredientRepository()
+        self._beverage_dao = BeverageDao()
+        self._ingredient_dao = IngredientDao()
 
     def do_show_beverage(self, args):
-        beverage_bunch = self._beverage_repository.get_beverages()
+        beverage_bunch = self._beverage_dao.find_all()
         for beverage in beverage_bunch:
             print(beverage.get_name())
 
     def do_show_ingredient(self, args):
-        ingredient_bunch = self._ingredient_repository.get_ingredients()
+        ingredient_bunch = self._ingredient_dao.find_all()
         for ingredient in ingredient_bunch:
             print(ingredient.get_name())
 
@@ -62,8 +66,9 @@ class SalesmanPrompt(BasePrompt):
         order.add_item(Ingredient("Sasd", "1.1"))
         order.add_item(Beverage("Tutu", "0.1"))
 
-        self._order_service.make_bill(order)
-        self._order_service.save(order)
+        order_service = OrderService(self.get_dao_manager())
+        order_service.make_bill(order)
+        order_service.save(order)
 
     def add_ingredient(self, args):
         return
@@ -79,12 +84,14 @@ class ManagerPrompt(BasePrompt):
 
     def __init__(self, user):
         super().__init__(user)
-
-    def do_show_sales_records(self, args):
-        reporter_service = ReportService(ConsoleExporter())
-        reporter_service.report()
+        self._reporter_service = ReportService(self.get_data_source())
 
     def do_generate_report(self, args):
-        reporter_service = ReportService(SpreadSheetExporter())
-        reporter_service.report()
-
+        if len(args) == 1:
+            arg = args[0]
+            if arg == "console":
+                self._reporter_service.report(ConsoleExporter())
+            elif arg == "sheet":
+                self._reporter_service.report(SpreadSheetExporter())
+        else:
+            print("please input args")

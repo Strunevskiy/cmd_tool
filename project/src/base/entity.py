@@ -92,7 +92,7 @@ class User(object):
 
 class Order(object):
 
-    def __init__(self, user):
+    def __init__(self, user: User):
         self._user = user
         self._item_bunch = []
 
@@ -105,11 +105,14 @@ class Order(object):
     def add_item(self, item: Item):
         self._item_bunch.append(item)
 
-    def get_items(self) -> []:
+    def get_items(self):
         return self._item_bunch
 
     def clean_item_bunch(self):
         self._item_bunch.clear()
+
+    def __str__(self):
+        return self._user.__str__() + " " + self._item_bunch
 
 
 class ReportRecord(object):

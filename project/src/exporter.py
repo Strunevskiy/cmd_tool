@@ -1,10 +1,16 @@
-class ConsoleExporter(object):
+class IExporter(object):
 
-    def export(self, records: []):
+    def export(self):
         pass
 
 
-class SpreadSheetExporter(object):
+class ConsoleExporter(IExporter):
 
-    def export(self, records: []):
+    def export(self):
+        pass
+
+
+class SpreadSheetExporter(IExporter):
+
+    def export(self):
         pass
