@@ -1,4 +1,4 @@
-from project.src.entity.base import Beverage, Ingredient
+from project.src.base.entity import Beverage, Ingredient
 from project.src.utils.file import PropertyUtil
 
 menu_storage_path = "./resource/menu.properties"

@@ -2,7 +2,7 @@ import logging.config
 import os
 
 from project.src.cmd import BasePrompt
-from project.src.entity.base import User
+from project.src.base.entity import User
 
 
 def main():

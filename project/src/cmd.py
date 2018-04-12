@@ -1,7 +1,7 @@
 import logging
 from cmd import Cmd
 
-from project.src.entity.base import POSITION, Order
+from project.src.base.entity import POSITION, Order, Beverage, Ingredient
 from project.src.exporter import ConsoleExporter, SpreadSheetExporter
 from project.src.repository import BeverageRepository, IngredientRepository
 from project.src.service import ReportService, OrderService
@@ -57,6 +57,11 @@ class SalesmanPrompt(BasePrompt):
 
     def do_submit_order(self, args):
         order = Order(self.get_user())
+        order.add_item(Beverage("bla", "20.1"))
+        order.add_item(Ingredient("Llil", "30.1"))
+        order.add_item(Ingredient("Sasd", "1.1"))
+        order.add_item(Beverage("Tutu", "0.1"))
+
         self._order_service.make_bill(order)
         self._order_service.save(order)
 

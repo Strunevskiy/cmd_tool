@@ -24,6 +24,9 @@ class Item(ABC):
     def get_type(self):
         pass
 
+    def __str__(self):
+        return "{} : {} : {}".format(self.get_name(), self.get_cost(), self.get_type())
+
 
 class Beverage(Item):
 
@@ -33,12 +36,6 @@ class Beverage(Item):
     def get_type(self):
         return TYPE.BEVERAGE
 
-    def __eq__(self, o: object) -> bool:
-        if isinstance(o, Beverage):
-            return self._name == o._name and self._cost == o._cost and self.get_type() == o.get_type()
-        else:
-            return False
-
 
 class Ingredient(Item):
 
@@ -47,12 +44,6 @@ class Ingredient(Item):
 
     def get_type(self):
         return TYPE.ADDITION
-
-    def __eq__(self, o: object) -> bool:
-        if isinstance(o, Ingredient):
-            return self._name == o._name and self._cost == o._cost and self.get_type() == o.get_type()
-        else:
-            return False
 
 
 class User(object):
@@ -94,6 +85,9 @@ class User(object):
     def from_string(cls, user):
         first_name, last_name, position = user.split(",")
         return cls(first_name, last_name, position)
+
+    def __str__(self):
+        return self.fullname
 
 
 class Order(object):
