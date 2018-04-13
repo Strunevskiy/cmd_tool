@@ -9,8 +9,8 @@ a manager can generate financial reports in different formats to see sales figur
 
 * There are two sorts of resources: bill and menu
     * After an order is submitted, corresponding bill is generated.
-    The generated bill is stored in ```the folder that is called outcome``` named as ```date when it was submitted```.
-    * All items available to salesman are stored in the property file that is called ```menu```.
+    The generated bill is stored in ```the folder that is called outcome named as date when it was submitted.
+    * All items available to salesman are stored in the property file that is called menu.
     Any item has a format ```item name=item cost```
 
 ## Setup environment
