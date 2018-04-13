@@ -28,8 +28,8 @@ class FileUtil(object):
     def read_to_string(path_to_file):
         file_content = ""
         try:
-            file = open(path_to_file)
-            file_content = file.read()
+            with open(path_to_file) as file:
+                file_content = file.read()
         except FileNotFoundError as e:
             logging.error("File was not found using file path {}. %s".format(path_to_file), e)
             return file_content
@@ -39,15 +39,13 @@ class FileUtil(object):
     @staticmethod
     def write(path_to_file, src=None, *args):
         try:
-            file_to_write = open(path_to_file, "w+")
-            if src is not None:
-                file_to_write.write(src)
-            for line in args:
-                file_to_write.writelines(line)
+            with open(path_to_file, "w+") as file_to_write:
+                if src is not None:
+                    file_to_write.write(src)
+                for line in args:
+                    file_to_write.writelines(line)
         except Exception as e:
             raise e
-        finally:
-            file_to_write.close()
 
 
 class TemplateUtil(object):

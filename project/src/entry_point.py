@@ -8,7 +8,7 @@ from project.src.base.entity import User
 def main():
     logging.config.fileConfig('./config/logging.ini')
 
-    user = User("Oleg", "Struneuski", "salesman")
+    user = User("Oleg", "Struneusk'i", "manager")
     prompt = BasePrompt.get_prompt(user)
     prompt.prompt = '> '
     prompt.cmdloop(user.get_position())

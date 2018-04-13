@@ -21,10 +21,10 @@ class DataSource(object):
             try:
                 self._connection = pymysql.connect(host=config.get("host"), port=int(config.get("port")),
                                                    user=config.get("user"), passwd=config.get("passwd"),
-                                                   database=config.get("database"), db=config.get("store"))
+                                                   database=config.get("database"), db=config.get("store"),
+                                                   cursorclass=pymysql.cursors.DictCursor)
             except Exception as e:
                 self._log.error("{}".format(e))
-                self.close()
             else:
                 return self._connection
         else:
@@ -32,6 +32,7 @@ class DataSource(object):
 
     def close(self):
         self._connection.close()
+        self._connection = None
 
     def commit(self):
         if self._connection is not None:

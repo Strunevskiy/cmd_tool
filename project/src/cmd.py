@@ -61,10 +61,11 @@ class SalesmanPrompt(BasePrompt):
 
     def do_submit_order(self, args):
         order = Order(self.get_user())
-        order.add_item(Beverage("bla", "20.1"))
-        order.add_item(Ingredient("Llil", "30.1"))
-        order.add_item(Ingredient("Sasd", "1.1"))
-        order.add_item(Beverage("Tutu", "0.1"))
+
+        order.add_item(Beverage("ddd", "20.1111"))
+        order.add_item(Ingredient("sss", "30.1111"))
+        order.add_item(Ingredient("aaa", "1.1111"))
+        order.add_item(Beverage("ccc", "0.1111"))
 
         order_service = OrderService(self.get_dao_manager())
         order_service.make_bill(order)
@@ -84,14 +85,16 @@ class ManagerPrompt(BasePrompt):
 
     def __init__(self, user):
         super().__init__(user)
-        self._reporter_service = ReportService(self.get_data_source())
+        self._reporter_service = ReportService(self.get_dao_manager())
 
-    def do_generate_report(self, args):
-        if len(args) == 1:
-            arg = args[0]
-            if arg == "console":
+    def do_generate_report(self, arg):
+        available_arg = ["-console", "-sheet"]
+        if arg:
+            if arg == available_arg[0]:
                 self._reporter_service.report(ConsoleExporter())
-            elif arg == "sheet":
+            elif arg == available_arg[1]:
                 self._reporter_service.report(SpreadSheetExporter())
+            else:
+                print("available arg:" + ", ".join(available_arg))
         else:
             print("please input args")

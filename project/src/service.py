@@ -46,4 +46,6 @@ class ReportService(object):
         self._dao_manager = dao_manager
 
     def report(self, exporter: IExporter):
-        exporter.export()
+        records = self._dao_manager.get_report_dao().get_sales_records()
+        exporter.export(records)
+

@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from decimal import Decimal, setcontext, Context
 
 
 class Item(ABC):
@@ -6,16 +7,15 @@ class Item(ABC):
     def __init__(self, name, cost):
         self._name = name
         self._cost = cost
-        super().__init__()
 
     def get_name(self):
         return self._name
 
-    def get_cost(self):
-        return self._cost
-
     def set_name(self, name):
         self._name = name
+
+    def get_cost(self):
+        return self._cost
 
     def set_cost(self, cost):
         self._cost = cost
@@ -130,6 +130,9 @@ class ReportRecord(object):
 
     def get_sales_value(self):
         return self._sales_value
+
+    def __str__(self):
+        return self._fullname + " " + str(self._sales_number) + " " + str(self._sales_value)
 
 
 class POSITION:
