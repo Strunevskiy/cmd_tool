@@ -1,4 +1,5 @@
-CREATE DATABASE IF NOT EXISTS coffee_db;
+DROP DATABASE IF EXISTS coffee_db;
+CREATE DATABASE coffee_db;
 
 DROP TABLE IF EXISTS coffee_db.orders;
 CREATE TABLE coffee_db.orders (

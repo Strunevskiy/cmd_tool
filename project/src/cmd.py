@@ -1,11 +1,11 @@
 import logging
 from cmd import Cmd
 
-from project.src.base.entity import POSITION, Order, Beverage, Ingredient
-from project.src.db import DataSource
-from project.src.exporter import ConsoleExporter, SpreadSheetExporter
+from project.src.base.entity import POSITION, Order, Item, TYPE
+from project.src.store.db import DataSource
+from project.src.exporter import ConsoleExporter, CSVExporter
 from project.src.service import ReportService, OrderService
-from project.src.store.dao import BeverageDao, IngredientDao, DaoManager
+from project.src.store.dao import DaoManager, ItemDao
 
 
 class BasePrompt(Cmd):
@@ -40,18 +40,17 @@ class SalesmanPrompt(BasePrompt):
 
     def __init__(self, user):
         super().__init__(user)
-        self._beverage_dao = BeverageDao()
-        self._ingredient_dao = IngredientDao()
+        self._item_dao = ItemDao()
 
     def do_show_beverage(self, args):
-        beverage_bunch = self._beverage_dao.find_all()
-        for beverage in beverage_bunch:
-            print(beverage.get_name())
+        items = self._item_dao.find_all_by_type(TYPE.BEVERAGE)
+        for item in items:
+            print(item.get_name())
 
     def do_show_ingredient(self, args):
-        ingredient_bunch = self._ingredient_dao.find_all()
-        for ingredient in ingredient_bunch:
-            print(ingredient.get_name())
+        items = self._item_dao.find_all_by_type(TYPE.ADDITION)
+        for item in items:
+            print(item.get_name())
 
     def do_get_price_by_beverage(self, args):
         return
@@ -62,10 +61,10 @@ class SalesmanPrompt(BasePrompt):
     def do_submit_order(self, args):
         order = Order(self.get_user())
 
-        order.add_item(Beverage("ddd", "20.1111"))
-        order.add_item(Ingredient("sss", "30.1111"))
-        order.add_item(Ingredient("aaa", "1.1111"))
-        order.add_item(Beverage("ccc", "0.1111"))
+        order.add_item(Item("ddd", "20.1111", TYPE.BEVERAGE))
+        order.add_item(Item("sss", "30.1111",TYPE.ADDITION))
+        order.add_item(Item("aaa", "1.1111", TYPE.ADDITION))
+        order.add_item(Item("ccc", "0.1111", TYPE.BEVERAGE))
 
         order_service = OrderService(self.get_dao_manager())
         order_service.make_bill(order)
@@ -93,7 +92,7 @@ class ManagerPrompt(BasePrompt):
             if arg == available_arg[0]:
                 self._reporter_service.report(ConsoleExporter())
             elif arg == available_arg[1]:
-                self._reporter_service.report(SpreadSheetExporter())
+                self._reporter_service.report(CSVExporter())
             else:
                 print("available arg:" + ", ".join(available_arg))
         else:

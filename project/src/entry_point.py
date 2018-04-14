@@ -1,8 +1,8 @@
 import logging.config
 import os
 
-from project.src.cmd import BasePrompt
 from project.src.base.entity import User
+from project.src.cmd import BasePrompt
 
 
 def main():
@@ -42,6 +42,7 @@ def exec_menu(choice):
             print("Invalid selection, please try again.")
             actions['fullname']()
     return
+
 
 actions = {'fullname': fullname, 'position': position}
 

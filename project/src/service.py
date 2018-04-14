@@ -2,7 +2,7 @@ import logging
 from time import strftime, gmtime
 
 from project.src.base.entity import Order
-from project.src.exporter import IExporter
+from project.src.exporter import Exporter
 from project.src.store.dao import DaoManager
 from project.src.utils.file import TemplateUtil, FileUtil
 
@@ -45,7 +45,7 @@ class ReportService(object):
     def __init__(self, dao_manager: DaoManager):
         self._dao_manager = dao_manager
 
-    def report(self, exporter: IExporter):
+    def report(self, exporter: Exporter):
         records = self._dao_manager.get_report_dao().get_sales_records()
         exporter.export(records)
 

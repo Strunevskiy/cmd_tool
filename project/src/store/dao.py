@@ -1,10 +1,6 @@
-from project.src.base.entity import Order, Item, Ingredient, Beverage, SalesReportRecord, ReportRecord
-from project.src.db import DataSource
+from project.src.base.entity import Order, Item, TYPE, ReportRecord
+from project.src.store.db import DataSource
 from project.src.utils.file import PropertyUtil
-
-menu_storage_path = "./resource/menu.properties"
-beverage_section = "BEVERAGE"
-ingredients_section = "INGREDIENT"
 
 
 class OrderDao(object):
@@ -28,7 +24,7 @@ class ItemDao(object):
 
     def insert(self, item: Item, order_id: int) -> int:
         with self._data_source.get_connection().cursor() as cursor:
-            params = (item.get_name(), item.get_type(), item.get_cost(), order_id)
+            params = (item.get_name(), item.get_item_type(), item.get_cost(), order_id)
             cursor.execute(self._insert_item, params)
 
 
@@ -80,45 +76,37 @@ class DaoManager(object):
         self._data_source.commit()
 
 
-class BeverageDao(object):
+menu_storage_path = "./resource/menu.properties"
+beverage_section = "BEVERAGE"
+ingredients_section = "INGREDIENT"
+
+
+def get_item_section_by_type(item_type: TYPE):
+    section = None
+    if item_type == TYPE.BEVERAGE:
+        section = beverage_section
+    elif item_type == TYPE.ADDITION:
+        section = ingredients_section
+    return section
+
+
+class ItemDao(object):
 
     def __init__(self):
         self._property_util = PropertyUtil()
 
-    def find_all(self):
-        beverages = self._property_util.get_entries(menu_storage_path, beverage_section);
-        beverage_bunch = []
-        for beverage in beverages:
-            beverage_bunch.append(Beverage(beverage[0], beverage[1]))
-        return beverage_bunch
+    def find_all_by_type(self, item_type: TYPE):
+        items = self._property_util.get_entries(menu_storage_path, get_item_section_by_type(item_type));
+        item_bunch = []
+        for item in items:
+            item_bunch.append(Item(item[0], item[1], item_type))
+        return item
 
-    def is_present(self, name_beverage):
-        beverages = self.find_all()
+    def is_present(self, item: Item):
+        items = self.find_all(item.get_item_type())
         is_present = False
-        for beverage in beverages:
-            name = beverage[0]
-            if name == name_beverage:
-                is_present = True
-        return is_present
-
-
-class IngredientDao(object):
-
-    def __init__(self):
-        self._property_util = PropertyUtil()
-
-    def find_all(self):
-        ingredients = self._property_util.get_entries(menu_storage_path, ingredients_section);
-        ingredient_bunch = []
-        for ingredient in ingredients:
-            ingredient_bunch.append(Ingredient(ingredient[0], ingredient[1]))
-        return ingredient_bunch
-
-    def is_present(self, name_ingredient):
-        ingredients = self.find_all()
-        is_present = False
-        for ingredient in ingredients:
-            name = ingredient[0]
-            if name == name_ingredient:
+        for item in items:
+            name = item[0]
+            if name == item.get_item_type():
                 is_present = True
         return is_present

@@ -1,12 +1,14 @@
-from abc import ABC, abstractmethod
-from decimal import Decimal, setcontext, Context
+class TYPE:
+    BEVERAGE = "beverage"
+    ADDITION = "addition"
 
 
-class Item(ABC):
+class Item(object):
 
-    def __init__(self, name, cost):
+    def __init__(self, name, cost, item_type: TYPE):
         self._name = name
         self._cost = cost
+        self._item_type = item_type
 
     def get_name(self):
         return self._name
@@ -20,35 +22,24 @@ class Item(ABC):
     def set_cost(self, cost):
         self._cost = cost
 
-    @abstractmethod
-    def get_type(self):
-        pass
+    def get_item_type(self):
+        self._item_type
+
+    def set_item_type(self, item_type: TYPE):
+        self._item_type = item_type
 
     def __str__(self):
-        return "{} : {} : {}".format(self.get_name(), self.get_cost(), self.get_type())
+        return "{} : {} : {}".format(self.get_name(), self.get_cost(), self.get_item_type())
 
 
-class Beverage(Item):
-
-    def __init__(self, name, cost):
-        super().__init__(name, cost)
-
-    def get_type(self):
-        return TYPE.BEVERAGE
-
-
-class Ingredient(Item):
-
-    def __init__(self, name, cost):
-        super().__init__(name, cost)
-
-    def get_type(self):
-        return TYPE.ADDITION
+class POSITION:
+    SALESMAN = "salesman"
+    MANAGER = "manager"
 
 
 class User(object):
 
-    def __init__(self, first_name, last_name, position):
+    def __init__(self, first_name, last_name, position: POSITION):
         self._first_name = first_name
         self._last_name = last_name
         self._position = position
@@ -133,13 +124,3 @@ class ReportRecord(object):
 
     def __str__(self):
         return self._fullname + " " + str(self._sales_number) + " " + str(self._sales_value)
-
-
-class POSITION:
-    SALESMAN = "salesman"
-    MANAGER = "manager"
-
-
-class TYPE:
-    BEVERAGE = "beverage"
-    ADDITION = "addition"

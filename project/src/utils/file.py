@@ -1,4 +1,5 @@
 import configparser
+import csv
 import logging
 from string import Template
 
@@ -10,10 +11,9 @@ class PropertyUtil(object):
         self._config = configparser.ConfigParser()
 
     def get_entries(self, file_name, section):
-        self._config.read(file_name)
-
         entries = {()}
         try:
+            self._config.read(file_name)
             entries = self._config.items(section)
         except Exception as e:
             self._log.error("Entries from property file were not extracted. %s", e)
@@ -55,3 +55,17 @@ class TemplateUtil(object):
         src = FileUtil.read_to_string(path_to_template)
         template = Template(src)
         return template.substitute(tmp_data)
+
+
+class CSVUtil(object):
+
+    @staticmethod
+    def write(path_to_csv_file, header, data, delimiter=','):
+        try:
+            with open(path_to_csv_file, "w+") as file_to_write:
+                csv_writer = csv.writer(file_to_write, fildenames=header, delimiter=delimiter)
+                csv_writer.writeheader()
+                for line in data:
+                    csv_writer.writerow(line)
+        except Exception as e:
+            raise e
