@@ -2,7 +2,7 @@ import logging
 from time import strftime, gmtime
 
 from project.src.base.entity import Order
-from project.src.exporter import Exporter
+from project.src.service.exporter import Exporter
 from project.src.store.dao import DaoManager
 from project.src.utils.file import TemplateUtil, FileUtil
 

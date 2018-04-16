@@ -1,49 +1,61 @@
 import logging.config
-import os
+import sys
 
-from project.src.base.entity import User
-from project.src.cmd import BasePrompt
+from project.src.base.entity import User, POSITION
+from project.src.cli import BasePrompt
+
+
+def convert_app_args(src_args: []):
+    args = {}
+    for arg in src_args:
+        if "=" in arg:
+            key, value = arg.split("=")
+            args[key] = value
+    return args
+
+
+def validate_required_args(args: map, required_args: set):
+    provided_args = args.keys()
+    left_required_args = required_args - provided_args
+    if len(left_required_args) != 0:
+        print("Mandatory args were not specified or were specified incorrectly: {}".format(left_required_args))
+        exit()
+
+
+def validate_mode(args, mode_types):
+    #    if mode not in mode_types:
+    #        print("-mode was specified incorrectly. There are two possible types {}".format(mode_types))
+    #        exit()
+    pass
+
+
+def validate_position(args, position_types):
+    #    if position not in position_types:
+    #       print("-position was specified incorrectly. There are two possible types {}".format(position_types))
+    #        exit()
+    pass
 
 
 def main():
     logging.config.fileConfig('./config/logging.ini')
 
-    user = User("Oleg", "Struneusk'i", "manager")
-    prompt = BasePrompt.get_prompt(user)
-    prompt.prompt = '> '
-    prompt.cmdloop(user.get_position())
+    app_args = sys.argv
+    required_args = {"-first_name", "-last_name", "-position", "-mode"}
+    mode_types = ["command_line", "interactive"]
+    position_types = [POSITION.MANAGER, POSITION.SALESMAN]
 
+    args = convert_app_args(app_args)
 
-def fullname():
-    os.system('clear')
-    print("Welcome")
-    choice = input(">  ")
-    exec_menu(choice)
-    return
+    validate_required_args(args, required_args)
+    validate_mode(args, mode_types)
+    validate_position(args, position_types)
 
+    prompt = BasePrompt.get_prompt(User(args.get("-first_name"), args.get("-last_name"), args.get("-position")))
+    mode = args.get("-mode")
+    if mode == mode_types[0]:
+        prompt.onecmd(args.get("-command"))
+    elif mode == mode_types[1]:
+        prompt.cmdloop()
 
-def position():
-    os.system('clear')
-    choice = input(">  ")
-    exec_menu(choice)
-    return
-
-
-def exec_menu(choice):
-    os.system('clear')
-
-    ch = choice.lower()
-    if ch == '':
-        actions['fullname']()
-    else:
-        try:
-            actions[ch]()
-        except KeyError:
-            print("Invalid selection, please try again.")
-            actions['fullname']()
-    return
-
-
-actions = {'fullname': fullname, 'position': position}
 
 if __name__ == "__main__": main()

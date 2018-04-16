@@ -29,7 +29,7 @@ class Item(object):
         self._item_type = item_type
 
     def __str__(self):
-        return "{} : {} : {}".format(self.get_name(), self.get_cost(), self.get_item_type())
+        return "{} : {} : {}".format(self._name, self._cost, self._item_type)
 
 
 class POSITION:

@@ -64,7 +64,7 @@ class DaoManager(object):
             self._order_dao = OrderDao(self._data_source)
         return self._order_dao
 
-    def get_report_dao(self):
+    def get_report_dao(self) -> ReportDao:
         if self._report_dao is None:
             self._report_dao = ReportDao(self._data_source)
         return self._report_dao
@@ -82,11 +82,12 @@ ingredients_section = "INGREDIENT"
 
 
 def get_item_section_by_type(item_type: TYPE):
-    section = None
     if item_type == TYPE.BEVERAGE:
         section = beverage_section
     elif item_type == TYPE.ADDITION:
         section = ingredients_section
+    else:
+        raise NotImplementedError("Item type must be BEVERAGE or ADDITION.")
     return section
 
 
@@ -96,17 +97,15 @@ class ItemDao(object):
         self._property_util = PropertyUtil()
 
     def find_all_by_type(self, item_type: TYPE):
-        items = self._property_util.get_entries(menu_storage_path, get_item_section_by_type(item_type));
-        item_bunch = []
-        for item in items:
-            item_bunch.append(Item(item[0], item[1], item_type))
-        return item
+        records = self._property_util.get_entries(menu_storage_path, get_item_section_by_type(item_type));
+        items = []
+        for name, cost in records:
+            items.append(Item(name, cost, item_type))
+        return items
 
     def is_present(self, item: Item):
-        items = self.find_all(item.get_item_type())
-        is_present = False
-        for item in items:
-            name = item[0]
-            if name == item.get_item_type():
-                is_present = True
-        return is_present
+        items = self.find_all_by_type(item.get_item_type())
+        for name, cost in items:
+            if name == item.item.get_name():
+                return True
+        return False
