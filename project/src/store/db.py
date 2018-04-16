@@ -2,7 +2,7 @@ import logging
 
 import pymysql
 
-from src.utils.file import PropertyUtil
+from project.src.utils.file import PropertyUtil
 
 
 class DataSource(object):

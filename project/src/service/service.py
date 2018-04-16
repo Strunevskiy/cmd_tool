@@ -28,6 +28,8 @@ class OrderService(object):
         FileUtil.write(self._bill_outcome_path_template.format(order_date), outcome)
 
     def save(self, order: Order):
+        if len(order.get_items()) == 0:
+            raise ValueError()
         try:
             order_id = self._dao_manager.get_order_dao().insert(order)
             for item in order.get_items():

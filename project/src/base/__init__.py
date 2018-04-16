@@ -1,1 +1,1 @@
-from src.base.entity import *
+from project.src.base.entity import *
