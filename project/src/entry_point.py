@@ -1,5 +1,6 @@
 import logging.config
 import sys
+from argparse import ArgumentParser
 
 from project.src.base.entity import User, POSITION
 from project.src.cli import BasePrompt

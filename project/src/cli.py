@@ -1,3 +1,4 @@
+import argparse
 import logging
 from cmd import Cmd
 
@@ -5,7 +6,7 @@ from project.src.base.entity import POSITION, Order, Item, TYPE
 from project.src.service.service import OrderService, ReportService
 from project.src.store.db import DataSource
 from project.src.service.exporter import ConsoleExporter, CSVExporter
-from project.src.store.dao import DaoManager, ItemDao
+from project.src.store.dao import DaoManager, ItemDao, ItemDaoFile
 
 
 def parse(args):
@@ -44,7 +45,7 @@ class SalesmanPrompt(BasePrompt):
 
     def __init__(self, user):
         super().__init__(user)
-        self._item_dao = ItemDao()
+        self._item_dao_file = ItemDaoFile()
         self._order: Order = None
 
     def do_show(self, args):
@@ -55,14 +56,13 @@ class SalesmanPrompt(BasePrompt):
             arg = args_cli[0]
             if arg in args_command_show:
 
-
                 if arg == args_command_show[0]:
-                    items = self._item_dao.find_all_by_type(TYPE.BEVERAGE)
+                    items = self._item_dao_file.find_all_by_type(TYPE.BEVERAGE)
                 elif arg == args_command_show[1]:
-                    items = self._item_dao.find_all_by_type(TYPE.ADDITION)
+                    items = self._item_dao_file.find_all_by_type(TYPE.ADDITION)
                 elif arg == args_command_show[2]:
-                    items = [*self._item_dao.find_all_by_type(TYPE.BEVERAGE),
-                             *self._item_dao.find_all_by_type(TYPE.ADDITION)]
+                    items = [*self._item_dao_file.find_all_by_type(TYPE.BEVERAGE),
+                             *self._item_dao_file.find_all_by_type(TYPE.ADDITION)]
                 if len(items) != 0:
                     for item in items:
                         print(item.get_name())

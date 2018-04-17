@@ -91,7 +91,7 @@ def get_item_section_by_type(item_type: TYPE):
     return section
 
 
-class ItemDao(object):
+class ItemDaoFile(object):
 
     def __init__(self):
         self._property_util = PropertyUtil()

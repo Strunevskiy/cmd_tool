@@ -28,18 +28,23 @@ class OrderService(object):
         FileUtil.write(self._bill_outcome_path_template.format(order_date), outcome)
 
     def save(self, order: Order):
+        logging.info("Trying to save the order: {}.".format(order))
         if len(order.get_items()) == 0:
-            raise ValueError()
+            raise ValueError("There was an attempt to save the order without items." + str(order))
         try:
             order_id = self._dao_manager.get_order_dao().insert(order)
             for item in order.get_items():
                 self._dao_manager.get_item_dao().insert(item, order_id)
         except Exception as e:
-            self._log.error("{}".format(e))
+            self._log.error("The order was not save due to {}. Order representation {}.".format(e, str(order)))
         else:
+            logging.info("Starting committing the order to db.".format(order))
             self._dao_manager.commit()
+            logging.info("Committed the order to db.".format(order))
         finally:
+            logging.info("Closing connection after committing the order to db.".format(order))
             self._dao_manager.close_connection()
+            logging.info("Closed connection after committing the order to db.".format(order))
 
 
 class ReportService(object):

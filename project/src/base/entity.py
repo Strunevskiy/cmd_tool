@@ -28,7 +28,7 @@ class Item(object):
     def set_item_type(self, item_type: TYPE):
         self._item_type = item_type
 
-    def __str__(self):
+    def __repr__(self):
         return "{} : {} : {}".format(self._name, self._cost, self._item_type)
 
 
@@ -77,6 +77,9 @@ class User(object):
         first_name, last_name, position = user.split(",")
         return cls(first_name, last_name, position)
 
+    def __repr__(self):
+        return "Full name: {}. Position: {}.".format(self.fullname, self._position)
+
     def __str__(self):
         return self.fullname
 
@@ -102,8 +105,8 @@ class Order(object):
     def clean_item_bunch(self):
         self._item_bunch.clear()
 
-    def __str__(self):
-        return self._user.__str__() + " " + self._item_bunch
+    def __repr__(self):
+        return "{} {}".format(self._user.__repr__(), str(self._item_bunch))
 
 
 class ReportRecord(object):

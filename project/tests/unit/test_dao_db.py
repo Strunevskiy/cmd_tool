@@ -3,10 +3,10 @@ import pytest
 
 
 @pytest.mark.dao
-class TestOrderDao(object):
+class TestDao(object):
 
-    def test_bad_id_order(self):
-        assert 1 == 1
+    def test_add_order(self):
+        pass
 
-    def test_bad_order(self):
+    def test_add_item(self):
         pass
