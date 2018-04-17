@@ -1,9 +1,9 @@
 from unittest.mock import Mock
 
 import pytest
-from project.src.base.entity import Order, User, POSITION, Item, ReportRecord
-from project.src.service import OrderService, ReportService, ConsoleExporter
-from project.src.store import DaoManager, DataSource
+from project.src.base.entity import ReportRecord, Order, User, Item, POSITION
+from project.src.service import ConsoleExporter, DaoManager, OrderService, ReportService
+from project.src.store import DataSource
 
 
 @pytest.mark.service
