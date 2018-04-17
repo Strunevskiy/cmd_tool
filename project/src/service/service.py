@@ -1,4 +1,5 @@
 import logging
+from decimal import Decimal
 from time import strftime, gmtime
 
 from project.src.base.entity import Order
@@ -48,11 +49,21 @@ class OrderService(object):
 
 
 class ReportService(object):
+    _log = logging.getLogger()
 
     def __init__(self, dao_manager: DaoManager):
         self._dao_manager = dao_manager
 
     def report(self, exporter: Exporter):
         records = self._dao_manager.get_report_dao().get_sales_records()
-        exporter.export(records)
+        total_sales = 0
+        total_values = 0.0000
+        export_data = []
+        for record in records:
+            sales_number = record.get_sales_number()
+            sales_value = record.get_sales_value()
+            total_sales += sales_number
+            total_values = Decimal(total_values) + Decimal(sales_value)
+            export_data.append((record.get_fullname(), str(sales_number), str(sales_value)))
+        exporter.export(export_data, total_sales, total_values)
 

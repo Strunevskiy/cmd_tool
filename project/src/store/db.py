@@ -8,12 +8,12 @@ from project.src.utils.file import PropertyUtil
 class DataSource(object):
     _log = logging.getLogger()
 
-    _path_to_config_file = "./config/db.properties"
-    _config_section = "CONFIG"
+    _path_to_config_file = "./config/db.cfg"
 
-    def __init__(self):
+    def __init__(self, config_section: str="CONFIG_LIVE"):
         self._connection = None
-        self._conf_property = PropertyUtil().get_entries(self._path_to_config_file, self._config_section)
+        self._section = config_section
+        self._conf_property = PropertyUtil().get_entries(self._path_to_config_file, self._section)
 
     def get_connection(self):
         if self._connection is None:

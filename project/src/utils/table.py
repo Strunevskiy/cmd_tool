@@ -1,3 +1,6 @@
+import logging
+
+
 def get_whitespaces(whitespace_number):
     whitespace = ""
     for i in range(whitespace_number):
@@ -52,6 +55,7 @@ class Padding(object):
 
 
 class ResizableTable(object):
+    _log = logging.getLogger()
 
     def __init__(self, body: [], header: [], footer: [], padding_left: Padding, padding_right: Padding,
                  alignment: Alignment, col_sep="|"):
@@ -62,8 +66,8 @@ class ResizableTable(object):
         self._col_sep = col_sep
 
     def print_table(self):
-        if not self._is_table():
-            raise ValueError
+        if not self.is_table():
+            raise ValueError()
 
         max_len_in_columns = self.get_max_len_in_columns()
         table_rep = ""
@@ -90,6 +94,6 @@ class ResizableTable(object):
         else:
             return table_rep
 
-    def _is_table(self):
+    def is_table(self):
         self._table
         return True

@@ -22,14 +22,14 @@ class Item(object):
     def set_cost(self, cost):
         self._cost = cost
 
-    def get_item_type(self):
-        self._item_type
+    def get_item_type(self) -> TYPE:
+        return self._item_type
 
     def set_item_type(self, item_type: TYPE):
         self._item_type = item_type
 
     def __repr__(self):
-        return "{} : {} : {}".format(self._name, self._cost, self._item_type)
+        return "{} : {} : {}".format(self.get_name(), self.get_cost(), self.get_item_type())
 
 
 class POSITION:
@@ -39,27 +39,27 @@ class POSITION:
 
 class User(object):
 
-    def __init__(self, first_name, last_name, position: POSITION):
+    def __init__(self, first_name: str, last_name: str, position: POSITION):
         self._first_name = first_name
         self._last_name = last_name
         self._position = position
 
-    def set_first_name(self, first_name):
+    def set_first_name(self, first_name: str):
         self._first_name = first_name
 
-    def set_last_name(self, last_name):
+    def set_last_name(self, last_name: str):
         self._last_name = last_name
 
-    def set_position(self, position):
+    def set_position(self, position: POSITION):
         self._position = position
 
-    def get_first_name(self):
+    def get_first_name(self) -> str:
         return self._first_name
 
-    def get_last_name(self):
+    def get_last_name(self) -> str:
         return self._last_name
 
-    def get_position(self):
+    def get_position(self) -> str:
         return self._position
 
     @property

@@ -76,7 +76,7 @@ class DaoManager(object):
         self._data_source.commit()
 
 
-menu_storage_path = "./resource/menu.properties"
+menu_storage_path = "./resource/menu.cfg"
 beverage_section = "BEVERAGE"
 ingredients_section = "INGREDIENT"
 
