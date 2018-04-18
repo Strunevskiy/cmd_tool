@@ -109,3 +109,6 @@ class ItemDaoFile(object):
             if name == item.item.get_name():
                 return True
         return False
+
+    def find_all(self):
+        return [*self.find_all_by_type(TYPE.BEVERAGE), *self.find_all_by_type(TYPE.ADDITION)]

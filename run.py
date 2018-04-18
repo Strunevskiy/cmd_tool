@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
 
-import project.src.entry_point
+import project.src.main
 
-project.src.entry_point.main()
+project.src.main.main()

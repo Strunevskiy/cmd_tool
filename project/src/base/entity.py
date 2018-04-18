@@ -96,8 +96,8 @@ class Order(object):
     def set_user(self, user: User):
         self._user = user
 
-    def add_item(self, item: Item):
-        self._item_bunch.append(item)
+    def add_items(self, *args):
+        self._item_bunch.extend(args)
 
     def get_items(self):
         return self._item_bunch

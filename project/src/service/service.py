@@ -1,4 +1,5 @@
 import logging
+import traceback
 from decimal import Decimal
 from time import strftime, gmtime
 
@@ -6,6 +7,7 @@ from project.src.base.entity import Order
 from project.src.service.exporter import Exporter
 from project.src.store.dao import DaoManager
 from project.src.utils.file import TemplateUtil, FileUtil
+from project.src.service.exception import ServiceError
 
 
 class OrderService(object):
@@ -31,13 +33,15 @@ class OrderService(object):
     def save(self, order: Order):
         logging.info("Trying to save the order: {}.".format(order))
         if len(order.get_items()) == 0:
-            raise ValueError("There was an attempt to save the order without items." + str(order))
+            raise ServiceError("There was an attempt to save the order without items." + str(order))
         try:
             order_id = self._dao_manager.get_order_dao().insert(order)
             for item in order.get_items():
                 self._dao_manager.get_item_dao().insert(item, order_id)
-        except Exception as e:
-            self._log.error("The order was not save due to {}. Order representation {}.".format(e, str(order)))
+        except Exception:
+            error_msg = "The order was not saved due to {}. " \
+                        "\n Order representation {}.".format(traceback.format_exc(), str(order))
+           # raise ServiceError(error_msg)
         else:
             logging.info("Starting committing the order to db.".format(order))
             self._dao_manager.commit()

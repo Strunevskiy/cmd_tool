@@ -16,7 +16,7 @@ class PropertyUtil(object):
             self._config.read(file_name)
             entries = self._config.items(section)
         except Exception as e:
-            self._log.error("Entries from property file were not extracted. %s", e)
+            self._log.exception(e)
             return entries
         else:
             return entries
@@ -26,13 +26,11 @@ class FileUtil(object):
 
     @staticmethod
     def read_to_string(path_to_file):
-        file_content = ""
         try:
             with open(path_to_file) as file:
                 file_content = file.read()
         except FileNotFoundError as e:
-            logging.error("File was not found using file path {}. %s".format(path_to_file), e)
-            return file_content
+            raise e
         else:
             return file_content
 

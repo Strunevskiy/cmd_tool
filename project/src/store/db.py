@@ -4,16 +4,17 @@ import pymysql
 
 from project.src.utils.file import PropertyUtil
 
+path_to_config_file = "./config/db.cfg"
+live_section = "CONFIG_LIVE"
+
 
 class DataSource(object):
     _log = logging.getLogger()
 
-    _path_to_config_file = "./config/db.cfg"
-
-    def __init__(self, config_section: str="CONFIG_LIVE"):
+    def __init__(self, config_section=live_section):
         self._connection = None
         self._section = config_section
-        self._conf_property = PropertyUtil().get_entries(self._path_to_config_file, self._section)
+        self._conf_property = PropertyUtil().get_entries(path_to_config_file, self._section)
 
     def get_connection(self):
         if self._connection is None:
@@ -24,7 +25,7 @@ class DataSource(object):
                                                    database=config.get("database"), db=config.get("store"),
                                                    cursorclass=pymysql.cursors.DictCursor)
             except Exception as e:
-                self._log.error("{}".format(e))
+                raise e
             else:
                 return self._connection
         else:
