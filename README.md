@@ -22,7 +22,7 @@ a manager can generate financial reports in different formats to see sales figur
 
 ## Setup database setting
 
-* To set up database setting it is required to fill listed properties in the db.properties file
+* To set up database setting it is required to fill listed properties in the db.cfg file stored in the config folder.
     * host
     * port
     * user
@@ -33,11 +33,11 @@ a manager can generate financial reports in different formats to see sales figur
 The utility can be used by users with different roles depending on provided role a user can execute a specific set of operations.
 
 * salesman role:
-    * show - arg is {beverage or ingredient}. It returns names of all available beverages or ingredients.
-    * price - arg is {beverage or ingredient}. It returns price of all available beverages or ingredients.
+    * show - arg is {beverage or ingredient}. It returns names of all the available beverages or ingredients.
+    * price - arg is {beverage or ingredient}. It returns price of all the available beverages or ingredients.
     * add_items - args are list of beverage or ingredient names passed vie whitespace. It adds items to order.
     * submit_order - no arg is required. It persists order data to DB and generates the bill of the order that is stored in folder outcome.
-    * clean - no arg is required. It is used to remove items being added to 
+    * clean - no arg is required. It is used to remove items added to the order.
 * manager role:
     * generate_report - arg is {console or sheet}. It produces summary of all the sales records by putting it in depending on the provided argument
     (console - the utility console, sheet - it has not been implemented yet)
