@@ -1,6 +1,7 @@
 import pytest
-from project.src.store import DataSource
-from project.src.store import DaoManager
+
+from src.store.dao import DaoManager
+from src.store.db import DataSource
 
 
 @pytest.mark.dao
@@ -26,11 +27,11 @@ class TestDao(object):
     def report_dao(self, dao_manager):
         return dao_manager.get_report_dao()
 
-    def test_order_dao_insert(self):
+    def test_order_dao_insert(self, order_dao):
         pass
 
-    def test_item_dao_insert(self):
+    def test_item_dao_insert(self, item_dao):
         pass
 
-    def test_report_dao_get_sales_record(self):
+    def test_report_dao_get_sales_record(self, report_dao):
         pass

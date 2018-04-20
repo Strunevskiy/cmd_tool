@@ -1,15 +1,16 @@
-from project.src.base.entity import Order, Item, TYPE, ReportRecord
-from project.src.store.db import DataSource
-from project.src.utils.file import PropertyUtil
+from decimal import Decimal
+
+from base.entity import ReportRecord, Item, TYPE
+from utils.file import PropertyUtil
 
 
 class OrderDao(object):
     _insert_order = """INSERT INTO orders (seller_name) VALUES (%s)"""
 
-    def __init__(self, data_source: DataSource):
+    def __init__(self, data_source):
         self._data_source = data_source
 
-    def insert(self, order: Order) -> int:
+    def insert(self, order):
         with self._data_source.get_connection().cursor() as cursor:
             cursor.execute(self._insert_order, order.get_user().fullname)
             order_id = cursor.lastrowid
@@ -19,13 +20,14 @@ class OrderDao(object):
 class ItemDao(object):
     _insert_item = """INSERT INTO order_items (item_name, item_type, cost, order_id) VALUES (%s, %s, %s, %s)"""
 
-    def __init__(self, data_source: DataSource):
+    def __init__(self, data_source):
         self._data_source = data_source
 
-    def insert(self, item: Item, order_id: int) -> int:
+    def insert(self, item, order_id):
         with self._data_source.get_connection().cursor() as cursor:
             params = (item.get_name(), item.get_item_type(), item.get_cost(), order_id)
-            cursor.execute(self._insert_item, params)
+            item_id = cursor.execute(self._insert_item, params)
+            return item_id
 
 
 class ReportDao(object):
@@ -33,7 +35,7 @@ class ReportDao(object):
                         FROM orders INNER JOIN order_items on orders.order_id = order_items.order_id 
                         GROUP BY orders.seller_name"""
 
-    def __init__(self, data_source: DataSource):
+    def __init__(self, data_source):
         self._data_source = data_source
 
     def get_sales_records(self):
@@ -48,23 +50,23 @@ class ReportDao(object):
 
 class DaoManager(object):
 
-    def __init__(self, data_source: DataSource):
+    def __init__(self, data_source):
         self._data_source = data_source
         self._item_dao = None
         self._order_dao = None
         self._report_dao = None
 
-    def get_item_dao(self) -> ItemDao:
+    def get_item_dao(self):
         if self._item_dao is None:
             self._item_dao = ItemDao(self._data_source)
         return self._item_dao
 
-    def get_order_dao(self) -> OrderDao:
+    def get_order_dao(self):
         if self._order_dao is None:
             self._order_dao = OrderDao(self._data_source)
         return self._order_dao
 
-    def get_report_dao(self) -> ReportDao:
+    def get_report_dao(self):
         if self._report_dao is None:
             self._report_dao = ReportDao(self._data_source)
         return self._report_dao
@@ -76,19 +78,9 @@ class DaoManager(object):
         self._data_source.commit()
 
 
-menu_storage_path = "./resource/menu.cfg"
+menu_storage_path = "./../resource/menu.cfg"
 beverage_section = "BEVERAGE"
 ingredients_section = "INGREDIENT"
-
-
-def get_item_section_by_type(item_type: TYPE):
-    if item_type == TYPE.BEVERAGE:
-        section = beverage_section
-    elif item_type == TYPE.ADDITION:
-        section = ingredients_section
-    else:
-        raise NotImplementedError("Item type must be BEVERAGE or ADDITION.")
-    return section
 
 
 class ItemDaoFile(object):
@@ -96,14 +88,14 @@ class ItemDaoFile(object):
     def __init__(self):
         self._property_util = PropertyUtil()
 
-    def find_all_by_type(self, item_type: TYPE):
-        records = self._property_util.get_entries(menu_storage_path, get_item_section_by_type(item_type));
+    def find_all_by_type(self, item_type):
+        records = self._property_util.get_entries(menu_storage_path, item_type.upper());
         items = []
         for name, cost in records:
-            items.append(Item(name, cost, item_type))
+            items.append(Item(name, Decimal(cost), item_type))
         return items
 
-    def is_present(self, item: Item):
+    def is_present(self, item):
         items = self.find_all_by_type(item.get_item_type())
         for name, cost in items:
             if name == item.item.get_name():
@@ -111,4 +103,7 @@ class ItemDaoFile(object):
         return False
 
     def find_all(self):
-        return [*self.find_all_by_type(TYPE.BEVERAGE), *self.find_all_by_type(TYPE.ADDITION)]
+        all_items = []
+        all_items.extend(self.find_all_by_type(TYPE.BEVERAGE))
+        all_items.extend(self.find_all_by_type(TYPE.ADDITION))
+        return all_items

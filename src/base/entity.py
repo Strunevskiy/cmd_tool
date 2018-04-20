@@ -1,13 +1,23 @@
+from decimal import Decimal
+
+
+def round_cost(cost):
+    return round(cost, 4)
+
+
 class TYPE:
+    def __init__(self):
+        pass
+
     BEVERAGE = "beverage"
-    ADDITION = "addition"
+    ADDITION = "ingredient"
 
 
 class Item(object):
 
-    def __init__(self, name, cost, item_type: TYPE):
+    def __init__(self, name, cost, item_type):
         self._name = name
-        self._cost = cost
+        self._cost = round_cost(Decimal(cost))
         self._item_type = item_type
 
     def get_name(self):
@@ -22,44 +32,50 @@ class Item(object):
     def set_cost(self, cost):
         self._cost = cost
 
-    def get_item_type(self) -> TYPE:
+    def get_item_type(self):
         return self._item_type
 
-    def set_item_type(self, item_type: TYPE):
+    def set_item_type(self, item_type):
         self._item_type = item_type
 
+    def __str__(self):
+        return "name : {}, price : {}, type : {}".format(self.get_name(), str(self.get_cost()), self.get_item_type())
+
     def __repr__(self):
-        return "{} : {} : {}".format(self.get_name(), self.get_cost(), self.get_item_type())
+        return "{} : {} : {}".format(self.get_name(), str(self.get_cost()), self.get_item_type())
 
 
 class POSITION:
+    def __init__(self):
+        pass
+
     SALESMAN = "salesman"
     MANAGER = "manager"
 
 
 class User(object):
 
-    def __init__(self, first_name: str, last_name: str, position: POSITION):
+    def __init__(self, first_name, last_name, position):
         self._first_name = first_name
         self._last_name = last_name
         self._position = position
 
-    def set_first_name(self, first_name: str):
+    def set_first_name(self, first_name):
         self._first_name = first_name
 
-    def set_last_name(self, last_name: str):
+    def set_last_name(self, last_name):
         self._last_name = last_name
 
-    def set_position(self, position: POSITION):
+    def set_position(self, position):
         self._position = position
 
-    def get_first_name(self) -> str:
+    def get_first_name(self):
         return self._first_name
 
-    def get_last_name(self) -> str:
+    def get_last_name(self):
         return self._last_name
 
-    def get_position(self) -> str:
+    def get_position(self):
         return self._position
 
     @property
@@ -86,14 +102,14 @@ class User(object):
 
 class Order(object):
 
-    def __init__(self, user: User):
+    def __init__(self, user):
         self._user = user
         self._item_bunch = []
 
-    def get_user(self) -> User:
+    def get_user(self):
         return self._user
 
-    def set_user(self, user: User):
+    def set_user(self, user):
         self._user = user
 
     def add_items(self, *args):
@@ -114,7 +130,7 @@ class ReportRecord(object):
     def __init__(self, fullname, sales_number, sales_value):
         self._fullname = fullname
         self._sales_number = sales_number
-        self._sales_value = sales_value
+        self._sales_value = round_cost(sales_value)
 
     def get_fullname(self):
         return self._fullname
@@ -125,5 +141,5 @@ class ReportRecord(object):
     def get_sales_value(self):
         return self._sales_value
 
-    def __str__(self):
-        return self._fullname + " " + str(self._sales_number) + " " + str(self._sales_value)
+    def __repr__(self):
+        return "fullname:{},sales:{},value:{}".format(self._fullname, self._sales_number, self._sales_value)

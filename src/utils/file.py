@@ -1,7 +1,8 @@
-import configparser
 import csv
 import logging
 from string import Template
+
+from future.moves import configparser
 
 
 class PropertyUtil(object):
@@ -29,7 +30,7 @@ class FileUtil(object):
         try:
             with open(path_to_file) as file:
                 file_content = file.read()
-        except FileNotFoundError as e:
+        except Exception as e:
             raise e
         else:
             return file_content
@@ -49,7 +50,7 @@ class FileUtil(object):
 class TemplateUtil(object):
 
     @staticmethod
-    def process_template(path_to_template, tmp_data: {}):
+    def process_template(path_to_template, tmp_data):
         src = FileUtil.read_to_string(path_to_template)
         template = Template(src)
         return template.substitute(tmp_data)

@@ -1,13 +1,15 @@
 import abc
 import logging
 
-from project.src.utils.table import ResizableTable, Padding, Alignment
+import six
+from utils.table import Padding, ResizableTable, Alignment
 
 
-class Exporter(abc.ABC):
+@six.add_metaclass(abc.ABCMeta)
+class Exporter:
 
     @abc.abstractmethod
-    def export(self, data: [[]], total_sales, total_values):
+    def export(self, data, total_sales, total_values):
         pass
 
 
@@ -19,7 +21,7 @@ class ConsoleExporter(Exporter):
     _header_third_col = "Total Values ($)"
     _footer_first_column = "Total:"
 
-    def export(self, data: [[]], total_sales, total_values):
+    def export(self, data, total_sales, total_values):
         header = [self._header_first_col, self._header_second_col, self._header_third_col]
         footer = [self._footer_first_column, str(total_sales), str(total_values)]
 
@@ -31,6 +33,8 @@ class ConsoleExporter(Exporter):
 
 
 class CSVExporter(Exporter):
-
-    def export(self, data: [[]], total_sales, total_values):
+    def __init__(self):
         pass
+
+    def export(self, data, total_sales, total_values):
+        raise NotImplementedError()

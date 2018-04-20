@@ -1,12 +1,14 @@
+#!/usr/bin/env python
+
 import logging.config
 from argparse import ArgumentParser
 
-from project.src.base.entity import User
-from project.src.cli import BasePrompt
+from base.entity import User
+from cli import BasePrompt
 
 
 def main():
-    logging.config.fileConfig('./config/logging.ini')
+    logging.config.fileConfig('./../config/logging.ini')
     # description a brief description of what the program does and how it works.
     parser = ArgumentParser(prog="coffee for me", description="coffee")
     parser.add_argument("first_name", metavar="first_name", help="user first name")

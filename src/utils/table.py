@@ -9,6 +9,9 @@ def get_whitespaces(whitespace_number):
 
 
 class ALIGNMENT:
+    def __init__(self):
+        pass
+
     LEFT = "left"
     RIGHT = "right"
     CENTER = "center"
@@ -39,7 +42,7 @@ class Alignment(object):
 
 class Padding(object):
 
-    def __init__(self, padding_columns: dict, default_padding=2):
+    def __init__(self, padding_columns, default_padding=2):
         self._padding_columns = padding_columns
         self._default_padding = default_padding
 
@@ -57,43 +60,50 @@ class Padding(object):
 class ResizableTable(object):
     _log = logging.getLogger()
 
-    def __init__(self, body: [], header: [], footer: [], padding_left: Padding, padding_right: Padding,
-                 alignment: Alignment, col_sep="|"):
-        self._table = [header[:], *body[:], footer[:]]
+    def __init__(self, body, header, footer, padding_left, padding_right, alignment, col_sep="|"):
+        self._body = body
+        self._header = header
+        self._footer = footer
         self._padding_left = padding_left
         self._padding_right = padding_right
         self._alignment = alignment
         self._col_sep = col_sep
 
     def print_table(self):
-        if not self.is_table():
+        table = self._form_table()
+        if not self._is_table(table):
             raise ValueError()
 
-        max_len_in_columns = self.get_max_len_in_columns()
+        max_len_in_columns = self._get_max_len_in_columns(table)
         table_rep = ""
-        for row_index, row in enumerate(self._table):
+        for row_index, row in enumerate(table):
             for column_index, item in enumerate(row):
-                table_rep = self.add_column_separator(column_index, table_rep)
+                table_rep = self._add_column_separator(column_index, table_rep)
                 table_rep = self._padding_left.add_padding(column_index, table_rep)
                 table_rep = self._alignment.make(column_index, item, max_len_in_columns[column_index], table_rep)
                 table_rep = self._padding_right.add_padding(column_index, table_rep)
             table_rep = table_rep + "\n"
         return table_rep
 
-    def get_max_len_in_columns(self):
+    def _get_max_len_in_columns(self, table):
         max_len_content_cols = []
-        for col in zip(*self._table):
+        for col in zip(*table):
             col_items_len = [len(col_item) for col_item in col]
             longest_content = max(col_items_len)
             max_len_content_cols.append(longest_content)
         return max_len_content_cols
 
-    def add_column_separator(self, column_index, table_rep):
+    def _add_column_separator(self, column_index, table_rep):
         if column_index != 0:
             return table_rep + self._col_sep
         else:
             return table_rep
 
-    def is_table(self):
-        self._table
+    def _is_table(self, table):
         return True
+
+    def _form_table(self):
+        table = [self._header]
+        table.extend(self._body)
+        table.append(self._footer)
+        return table
