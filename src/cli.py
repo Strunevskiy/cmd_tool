@@ -126,7 +126,7 @@ class SalesmanPrompt(BasePrompt):
         print("Submit the created order.")
         print("No args are required.")
 
-    def add_item(self, arg):
+    def add_items(self, arg):
         self._log.info("Command add_item was invoked.")
 
         requested_items = arg.split(" ")
@@ -160,7 +160,7 @@ class SalesmanPrompt(BasePrompt):
             print("Specified beverage or ingredient was not added to the order because of some not being found: " + not_found_items_str)
             self.help_add_item_to_order()
 
-    def help_add_item(self):
+    def help_add_items(self):
         print("Command add_item can be invoked with args.")
         print("Args are list of beverage or ingredient names passed vie whitespace.")
 
