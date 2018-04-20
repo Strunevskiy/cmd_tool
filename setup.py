@@ -6,5 +6,5 @@ setup(
     author="Aleh Struneuski",
     author_email="oleg.strunevskiy@gmail.com",
     packages=find_packages(),
-    install_requires=["pymysql", "six", "future", "mock"]
+    install_requires=["PyMySQL", "six", "future", "mock"]
 )

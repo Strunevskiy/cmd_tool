@@ -3,8 +3,8 @@
 import logging.config
 from argparse import ArgumentParser
 
-from base.entity import User
-from cli import BasePrompt
+from src.base.entity import User
+from src.cli import BasePrompt
 
 
 def main():

@@ -2,7 +2,7 @@ import abc
 import logging
 
 import six
-from utils.table import Padding, ResizableTable, Alignment
+from src.utils.table import Padding, ResizableTable, Alignment
 
 
 @six.add_metaclass(abc.ABCMeta)

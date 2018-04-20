@@ -2,7 +2,7 @@ import logging
 
 import pymysql
 
-from utils.file import PropertyUtil
+from src.utils.file import PropertyUtil
 
 path_to_config_file = "./../config/db.cfg"
 live_section = "CONFIG_LIVE"
