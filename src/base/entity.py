@@ -15,10 +15,11 @@ class TYPE:
 
 class Item(object):
 
-    def __init__(self, name, cost, item_type):
+    def __init__(self, name="", cost=0, item_type="", item_id=0):
         self._name = name
         self._cost = round_cost(Decimal(cost))
         self._item_type = item_type
+        self._item_id = item_id
 
     def get_name(self):
         return self._name
@@ -38,6 +39,23 @@ class Item(object):
     def set_item_type(self, item_type):
         self._item_type = item_type
 
+    def get_item_id(self):
+        return self._item_id
+
+    def set_item_id(self, item_id):
+        self._item_id = item_id
+
+    def __key(self):
+        return self._name, self._cost, self._item_type, self._item_id
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return (isinstance(other, type(self)) and
+                (self._name, self._cost, self._item_type, self._item_id)
+                == (other.get_name(), other.get_cost(), other.get_item_type(), other.get_item_id()))
+
     def __str__(self):
         return "name : {}, price : {}, type : {}".format(self.get_name(), str(self.get_cost()), self.get_item_type())
 
@@ -55,7 +73,7 @@ class POSITION:
 
 class User(object):
 
-    def __init__(self, first_name, last_name, position):
+    def __init__(self, first_name="", last_name="", position=""):
         self._first_name = first_name
         self._last_name = last_name
         self._position = position
@@ -84,14 +102,14 @@ class User(object):
 
     @fullname.setter
     def fullname(self, fullname):
-        fist_name, last_name = fullname.split(",")
-        self._first_name = fist_name.rstrip()
-        self._last_name = last_name.rstrip()
+        fist_name, last_name = fullname.split(", ")
+        self._first_name = fist_name
+        self._last_name = last_name
 
     @classmethod
-    def from_string(cls, user):
-        first_name, last_name, position = user.split(",")
-        return cls(first_name, last_name, position)
+    def from_string(cls, fullname, position=""):
+        first_name, last_name = fullname.split(", ")
+        return cls(first_name=first_name, last_name=last_name, position=position)
 
     def __repr__(self):
         return "Full name: {}. Position: {}.".format(self.fullname, self._position)
@@ -102,8 +120,9 @@ class User(object):
 
 class Order(object):
 
-    def __init__(self, user):
+    def __init__(self, user, order_id=0):
         self._user = user
+        self._order_id = order_id
         self._item_bunch = []
 
     def get_user(self):

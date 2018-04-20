@@ -1,7 +1,9 @@
+import logging
+
 import pytest
 from mock import Mock
 
-from src.base.entity import POSITION, TYPE, Order, Item, User, ReportRecord
+from src.base.entity import ReportRecord
 from src.service.exception import ServiceError
 from src.service.exporter import ConsoleExporter
 from src.service.service import ReportService, OrderService
@@ -11,6 +13,7 @@ from src.store.db import DataSource
 
 @pytest.mark.service
 class TestOrderService(object):
+    _log = logging.getLogger()
 
     @pytest.fixture
     def mock_dao_manager(self):
@@ -28,25 +31,15 @@ class TestOrderService(object):
     def report_service(self, mock_dao_manager):
         return ReportService(mock_dao_manager)
 
-    @pytest.fixture
-    def valid_order(self):
-        test_order = Order(User("Oleg", "Strunevskiy", POSITION.MANAGER))
-        test_order.add_items(Item("late", 2.0000, TYPE.ADDITION), Item("espresso", 2.0000, TYPE.BEVERAGE))
-        return test_order
-
-    @pytest.fixture
-    def invalid_order(self):
-        return Order(User("Oleg", "Strunevskiy", POSITION.MANAGER))
-
     def test_order_service_save_valid_order(self, mock_dao_manager, order_service, valid_order):
         order_id = 1
-        mock_dao_manager.get_order_dao().insert.return_value = order_id
+        mock_dao_manager.get_order_dao().persist.return_value = order_id
 
         order_service.save(valid_order)
 
-        mock_dao_manager.get_order_dao().insert.assert_called_with(valid_order)
+        mock_dao_manager.get_order_dao().persist.assert_called_with(valid_order)
         for item in valid_order.get_items():
-            mock_dao_manager.get_item_dao().insert.assert_any_call(item, order_id)
+            mock_dao_manager.get_item_dao().persist.assert_any_call(item, order_id)
 
         mock_dao_manager.commit.assert_called_once()
         mock_dao_manager.close_connection.assert_called_once()

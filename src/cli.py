@@ -121,12 +121,14 @@ class SalesmanPrompt(BasePrompt):
         else:
             self._log.info("Order was submitted successfully. Order: {}".format(str(self._order)))
             print("Order was submitted successfully.")
+        finally:
+            self._order = None
 
     def help_submit_order(self):
         print("Submit the created order.")
         print("No args are required.")
 
-    def add_items(self, arg):
+    def do_add_items(self, arg):
         self._log.info("Command add_item was invoked.")
 
         requested_items = arg.split(" ")
@@ -151,7 +153,7 @@ class SalesmanPrompt(BasePrompt):
         if len(not_found_items) == 0:
             self._log.info("All requested items were found and are ready to be added to the order.")
             self._create_order()
-            self._order.add_items(order_items)
+            self._order.add_items(*order_items)
             self._log.info("Requested items were added to the order.")
             print("Provided beverage or ingredient was added to the order.")
         else:
@@ -180,7 +182,7 @@ class SalesmanPrompt(BasePrompt):
 
     def _create_order(self):
         if self._order is None:
-            self._order = Order()
+            self._order = Order(self.get_user())
             self._log.info("Order was created.")
         else:
             self._log.info("Order has been already created.")
