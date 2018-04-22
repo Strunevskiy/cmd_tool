@@ -60,8 +60,3 @@ class TestOrderService(object):
         mock_dao_manager.get_report_dao().get_sales_records.return_value = test_report_records
         report_service.report(mock_console_exporter)
         mock_console_exporter.export.assert_called_once_with(exp_export_data, exp_total_sales, exp_total_values)
-
-    def test_report_service_report_to_console_dao_return_nothing(self, mock_dao_manager, report_service, mock_console_exporter):
-        mock_dao_manager.get_report_dao().get_sales_records.return_value = []
-        with pytest.raises(ServiceError, message='Expect ServiceError if dao returns nothing'):
-            report_service.report(mock_console_exporter)

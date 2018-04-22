@@ -23,21 +23,21 @@ class Alignment(object):
         self._alignment_columns = alignment_columns
         self._default_alignment = default_alignment
 
-    def get_alignment_type(self, column_index):
-        alignment_column = self._alignment_columns.get(column_index)
-        if alignment_column is not None:
-            return alignment_column
-        else:
-            return self._default_alignment
-
     def make(self, column_index, item, max_len, table_rep):
-        alignment_type = self.get_alignment_type(column_index)
+        alignment_type = self._get_alignment_type(column_index)
         if alignment_type == ALIGNMENT.LEFT:
             item_len = len(item)
             whitespace_number = max_len - item_len
             return table_rep + item + get_whitespaces(whitespace_number)
         else:
             raise NotImplementedError
+
+    def _get_alignment_type(self, column_index):
+        alignment_column = self._alignment_columns.get(column_index)
+        if alignment_column is not None:
+            return alignment_column
+        else:
+            return self._default_alignment
 
 
 class Padding(object):
@@ -46,33 +46,33 @@ class Padding(object):
         self._padding_columns = padding_columns
         self._default_padding = default_padding
 
-    def get_padding(self, column_index):
+    def add_padding(self, column_index, table):
+        return table + get_whitespaces(self._get_padding(column_index))
+
+    def _get_padding(self, column_index):
         padding_column = self._padding_columns.get(column_index)
         if padding_column is not None:
             return padding_column
         else:
             return self._default_padding
 
-    def add_padding(self, column_index, table):
-        return table + get_whitespaces(self.get_padding(column_index))
-
 
 class ResizableTable(object):
     _log = logging.getLogger()
 
-    def __init__(self, body, header, footer, padding_left, padding_right, alignment, col_sep="|"):
-        self._body = body
-        self._header = header
-        self._footer = footer
+    def __init__(self, padding_left, padding_right, alignment, header, body=[], footer=[], col_sep="|"):
         self._padding_left = padding_left
         self._padding_right = padding_right
         self._alignment = alignment
+        self._header = header
+        self._body = body
+        self._footer = footer
         self._col_sep = col_sep
 
     def print_table(self):
         table = self._form_table()
         if not self._is_table(table):
-            raise ValueError()
+            raise ValueError("Number of header columns does not match up with number of body columns.")
 
         max_len_in_columns = self._get_max_len_in_columns(table)
         table_rep = ""
@@ -100,10 +100,13 @@ class ResizableTable(object):
             return table_rep
 
     def _is_table(self, table):
-        return True
+        rows_size = {len(row) for row in table}
+        return len(rows_size) == 1
 
     def _form_table(self):
         table = [self._header]
-        table.extend(self._body)
-        table.append(self._footer)
+        if len(self._body) != 0:
+            table.extend(self._body)
+        if len(self._footer) != 0:
+            table.append(self._footer)
         return table

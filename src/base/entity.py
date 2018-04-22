@@ -160,5 +160,16 @@ class ReportRecord(object):
     def get_sales_value(self):
         return self._sales_value
 
+    def __key(self):
+        return self._fullname, self._sales_number, self._sales_value
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __eq__(self, other):
+        return (isinstance(other, type(self)) and
+                (self._fullname, self._sales_number, self._sales_value)
+                == (other.get_fullname(), other.get_sales_number(), other.get_sales_value()))
+
     def __repr__(self):
         return "fullname:{},sales:{},value:{}".format(self._fullname, self._sales_number, self._sales_value)

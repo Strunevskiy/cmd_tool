@@ -19,8 +19,11 @@ class OrderService(object):
         self._dao_manager = dao_manager
 
     def make_bill(self, order):
-        order_date = strftime(self._bill_date_format, gmtime())
+        self._log.info("Trying to make the order bill: {}.".format(order))
+        if len(order.get_items()) == 0:
+            raise ServiceError("There was an attempt to make the bill without items." + str(order))
 
+        order_date = strftime(self._bill_date_format, gmtime())
         items_to_string = "\n".join([item.__str__() for item in order.get_items()])
         template_data = {"date": order_date, "user": order.get_user().fullname, "item": items_to_string}
         outcome = TemplateUtil.process_template(self._bill_template_path, template_data)
@@ -63,9 +66,6 @@ class ReportService(object):
         else:
             self._log.info("Sales records were extracted.")
             self._log.debug("Extracted sales records: %s", records)
-
-        if len(records) == 0:
-            raise ServiceError("No sales records were found.")
 
         total_sales = 0
         total_values = 0.0000

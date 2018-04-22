@@ -2,7 +2,7 @@ import abc
 import logging
 
 import six
-from src.utils.table import Padding, ResizableTable, Alignment
+from src.rendering.table import Padding, ResizableTable, Alignment
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -27,7 +27,7 @@ class ConsoleExporter(Exporter):
 
         padding_left = Padding({0: 0, 1: 5, 2: 5})
         padding_right = Padding({0: 5, 1: 5, 2: 5})
-        table = ResizableTable(data, header, footer, padding_left, padding_right, Alignment())
+        table = ResizableTable(padding_left, padding_right, Alignment(), header, data, footer)
         printed_table = table.print_table()
         print(printed_table)
 
