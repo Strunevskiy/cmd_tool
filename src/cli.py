@@ -207,9 +207,6 @@ class ManagerPrompt(BasePrompt):
                 elif arg == self._available_args_gen_report[1]:
                     self._log.info("Generating report into CSV.")
                     self._reporter_service.report(CSVExporter())
-            except ServiceError as e:
-                self._log.exception(e)
-                print("Report was not generated. The possible root cause: " + str(e))
             except Exception as e:
                 self._log.exception(e)
                 print("Report was not generated due to unexpected things.")

@@ -76,10 +76,15 @@ class ReportService(object):
             total_sales = total_sales + sales_number
             total_values = Decimal(total_values) + Decimal(sales_value)
             export_data.append((record.get_fullname(), str(sales_number), str(sales_value)))
-        self._log.info("Exporting sales data.")
         self._log.debug("Sales data: \n %s", export_data)
         self._log.debug("Total sales: %s. Total cost: %s", total_sales, round_cost(total_values))
-        exporter.export(export_data, str(total_sales), str(round_cost(total_values)))
-        self._log.info("Exporting was completed.")
+
+        try:
+            self._log.info("Exporting sales data.")
+            exporter.export(export_data, str(total_sales), str(round_cost(total_values)))
+        except AttributeError as e:
+            raise e
+        else:
+            self._log.info("Exporting was completed.")
 
 
