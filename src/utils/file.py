@@ -1,23 +1,25 @@
+import abc
 import csv
 import logging
 from string import Template
 
+import six
 from future.moves import configparser
 
 
 class PropertyUtil(object):
-    _log = logging.getLogger()
+    __log = logging.getLogger()
 
     def __init__(self):
-        self._config = configparser.ConfigParser()
+        self.__config = configparser.ConfigParser()
 
     def get_entries(self, file_name, section):
         entries = {()}
         try:
-            self._config.read(file_name)
-            entries = self._config.items(section)
+            self.__config.read(file_name)
+            entries = self.__config.items(section)
         except Exception as e:
-            self._log.exception(e)
+            self.__log.exception(e)
             return entries
         else:
             return entries
@@ -50,7 +52,7 @@ class FileUtil(object):
 class TemplateUtil(object):
 
     @staticmethod
-    def process_template(path_to_template, tmp_data):
+    def process(path_to_template, tmp_data):
         src = FileUtil.read_to_string(path_to_template)
         template = Template(src)
         return template.substitute(tmp_data)

@@ -1,6 +1,9 @@
+import random
+from decimal import Decimal
+
 import pytest
 
-from src.base.entity import Order, User, Item, ReportRecord, TYPE
+from src.base.entity import Order, User, Item, ReportRecord, TYPE, round_cost
 from src.store.dao import DaoManager
 from src.store.db import DataSource
 
@@ -11,7 +14,9 @@ class TestDao(object):
     @pytest.fixture(scope="class")
     def dao_manager(self):
         dao_manager = DaoManager(DataSource(config_section="CONFIG_QA"))
+        self.__delete_orders(dao_manager)
         yield dao_manager
+        self.__delete_orders(dao_manager)
         dao_manager.close_connection()
 
     def test_order_dao_insert(self, dao_manager, valid_order):
@@ -45,7 +50,7 @@ class TestDao(object):
         act_items = []
         try:
             for persisted_item in exp_items:
-                item = dao_manager.get_item_dao().find_by_item_id(persisted_item.get_item_id())
+                item = dao_manager.get_item_dao().find_by_id(persisted_item.get_item_id())
                 act_items.append(item)
         except Exception as e:
             assert False, e
@@ -53,12 +58,7 @@ class TestDao(object):
         assert act_items == exp_items
 
     def test_report_dao_get_sales_record(self, dao_manager):
-        order_test_first = Order(User("test_1", "test_1"))
-        order_test_first.add_items(Item("test_11", 1.2120, TYPE.BEVERAGE), Item("test_21", 0.2120, TYPE.ADDITION))
-        order_test_second = Order(User("test_2", "test_2"))
-        order_test_second.add_items(Item("test_21", 2.2120, TYPE.BEVERAGE), Item("test_22", 5.9120, TYPE.BEVERAGE))
-        exp_orders = [order_test_first, order_test_second]
-
+        exp_orders = self.__create_random_orders(amount=2, items=2)
         for order in exp_orders:
             try:
                 order_id = dao_manager.get_order_dao().persist(order)
@@ -75,14 +75,37 @@ class TestDao(object):
             sales_number = len(exp_order.get_items())
             sales_value = 0.0000
             for item in exp_order.get_items():
-                sales_value = sales_value + item.get_cost()
+                sales_value = Decimal(sales_value) + Decimal(item.get_cost())
             exp_report_records.append(ReportRecord(fullname, sales_number, sales_value))
 
         try:
             act_report_records = dao_manager.get_report_dao().get_sales_records()
         except Exception as e:
             assert False, e
+        act_report_records = [act_report_record for act_report_record in act_report_records if
+                              act_report_record in exp_report_records]
 
-        act_report_records = [act_report_record for act_report_record in act_report_records if act_report_record in exp_report_records]
+        exp_report_records.sort(key=lambda x: x.get_sales_value())
+        act_report_records.sort(key=lambda x: x.get_sales_value())
 
         assert exp_report_records == act_report_records
+
+    def __delete_orders(self, dao_manager):
+        orders = dao_manager.get_order_dao().find_all()
+        for order in orders:
+            dao_manager.get_order_dao().delete_by_id(order.get_id())
+        dao_manager.commit()
+
+    def __create_random_orders(self, amount, items):
+        orders = []
+        for order_number in range(amount):
+            first_name = "test_first_name_{}".format(random.randint(1, 100))
+            last_name = "test_last_name_{}".format(random.randint(1, 100))
+            order = Order(User(first_name, last_name))
+            for item_number in range(items):
+                name = "test_item_{}".format(random.randint(1, 100))
+                cost = round_cost(random.uniform(0.0000, 100.000))
+                item_type = random.choice([TYPE.ADDITION, TYPE.BEVERAGE])
+                order.add_items(Item(name, cost, item_type))
+            orders.append(order)
+        return orders

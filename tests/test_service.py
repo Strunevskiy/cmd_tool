@@ -1,5 +1,3 @@
-import logging
-
 import pytest
 from mock import Mock
 
@@ -13,7 +11,6 @@ from src.store.db import DataSource
 
 @pytest.mark.service
 class TestOrderService(object):
-    _log = logging.getLogger()
 
     @pytest.fixture
     def mock_dao_manager(self):
@@ -45,7 +42,7 @@ class TestOrderService(object):
         mock_dao_manager.close_connection.assert_called_once()
 
     def test_order_service_save_invalid_order(self, order_service, invalid_order):
-        with pytest.raises(ServiceError, message='Expect ServiceError if order passed to service is without items'):
+        with pytest.raises(ServiceError, message="Expect ServiceError if order passed to service is without items"):
             order_service.save(invalid_order)
 
     def test_report_service_report_to_console(self, mock_dao_manager, report_service, mock_console_exporter):
@@ -60,3 +57,14 @@ class TestOrderService(object):
         mock_dao_manager.get_report_dao().get_sales_records.return_value = test_report_records
         report_service.report(mock_console_exporter)
         mock_console_exporter.export.assert_called_once_with(exp_export_data, exp_total_sales, exp_total_values)
+
+    def test_report_service_attribute_error(self, mock_dao_manager, report_service):
+        with pytest.raises(AttributeError, message="Expect AttributeError if the arg of report method is an object "
+                                                   "without export interface."):
+            mock_dao_manager.get_report_dao().get_sales_records.return_value = [ReportRecord("Test_0, Test1", 20, 20.1010)]
+            mock_without_export_method = Mock(spec=ObjectWoExportMethod())
+            report_service.report(mock_without_export_method)
+
+
+class ObjectWoExportMethod(object):
+    pass
