@@ -60,21 +60,21 @@ class OrderService(object):
         if len(order.get_items()) == 0:
             raise ServiceError("There was an attempt to save the order without items." + str(order))
         try:
-            logger.debug("Persisting the order: {}.".format(order))
+            logger.info("Persisting the order: {}.".format(order))
             order_id = self.__dao_manager.get_order_dao().persist(order)
-            logger.debug("The order was persisted with order id: " + str(order_id))
+            logger.info("The order was persisted with order id: " + str(order_id))
             for item in order.get_items():
-                logger.debug("Persisting the item: {}.".format(item))
+                logger.info("Persisting the item: {}.".format(item))
                 item_id = self.__dao_manager.get_item_dao().persist(item, order_id)
-                logger.debug("The item was persisted with item id: " + str(item_id))
+                logger.info("The item was persisted with item id: " + str(item_id))
         except Exception as e:
             raise e
         else:
             self.__dao_manager.commit()
-            logging.info("The order was committed to DB.")
+            logger.info("The order was committed to DB.")
         finally:
             self.__dao_manager.close_connection()
-            logging.debug("DB connection was closed.")
+            logger.info("DB connection was closed.")
 
 
 class ReportService(object):
