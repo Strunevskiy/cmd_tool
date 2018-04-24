@@ -37,7 +37,7 @@ class OrderService(object):
             ServiceError: if provided order does not contain items.
         """
         logger.info("Trying to make the order bill: {}.".format(order))
-        if len(order.get_items()) == 0:
+        if order is None or len(order.get_items()) == 0:
             raise ServiceError("There was an attempt to make the bill without items." + str(order))
         order_date = datetime.now().strftime(self.BILL_DATA_FORMAT)
         items_to_string = "\n".join([item.__str__() for item in order.get_items()])
@@ -56,7 +56,7 @@ class OrderService(object):
             Exception: if order can not be persisted due to exception in dao layer.
         """
         logger.info("Trying to save the order: {}.".format(order))
-        if len(order.get_items()) == 0:
+        if order is None or len(order.get_items()) == 0:
             raise ServiceError("There was an attempt to save the order without items." + str(order))
         try:
             logger.info("Persisting the order: {}.".format(order))
