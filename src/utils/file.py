@@ -1,14 +1,13 @@
-import abc
 import csv
 import logging
 from string import Template
 
-import six
 from future.moves import configparser
+
+logger = logging.getLogger()
 
 
 class PropertyUtil(object):
-    __log = logging.getLogger()
 
     def __init__(self):
         self.__config = configparser.ConfigParser()
@@ -19,7 +18,7 @@ class PropertyUtil(object):
             self.__config.read(file_name)
             entries = self.__config.items(section)
         except Exception as e:
-            self.__log.exception(e)
+            logger.exception(e)
             return entries
         else:
             return entries
@@ -38,11 +37,9 @@ class FileUtil(object):
             return file_content
 
     @staticmethod
-    def write(path_to_file, src=None, *args):
+    def write(path_to_file, *args):
         try:
             with open(path_to_file, "w+") as file_to_write:
-                if src is not None:
-                    file_to_write.write(src)
                 for line in args:
                     file_to_write.writelines(line)
         except Exception as e:

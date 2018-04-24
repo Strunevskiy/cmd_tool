@@ -12,10 +12,10 @@ class OrderDao(object):
         __data_source (DataSource): an object holding DB connection and configuration.
     """
 
-    INSERT_ORDER = """INSERT INTO orders (seller_name) VALUES (%s)"""
-    SELECT_BY_ID = """SELECT seller_name FROM orders WHERE order_id = (%s)"""
-    SELECT_ALL = """SELECT order_id, seller_name FROM orders"""
-    DELETE_BY_ID = """DELETE FROM orders WHERE order_id = (%s)"""
+    INSERT_ORDER = "INSERT INTO orders (seller_name) VALUES (%s)"
+    SELECT_BY_ID = "SELECT seller_name FROM orders WHERE order_id = (%s)"
+    SELECT_ALL = "SELECT order_id, seller_name FROM orders"
+    DELETE_BY_ID = "DELETE FROM orders WHERE order_id = (%s)"
 
     def __init__(self, data_source):
         self.__data_source = data_source
@@ -80,9 +80,9 @@ class ItemDao(object):
         __data_source (DataSource): an object holding DB connection and configuration.
     """
 
-    INSERT_ITEM = """INSERT INTO order_items (item_name, item_type, cost, order_id) VALUES (%s, %s, %s, %s)"""
-    SELECT_BY_ITEM_ID = """SELECT item_name, item_type, cost, order_id FROM order_items WHERE item_id = (%s)"""
-    SELECT_BY_ORDER_ID = """SELECT item_id, item_name, item_type, cost FROM order_items WHERE order_id = (%s)"""
+    INSERT_ITEM = "INSERT INTO order_items (item_name, item_type, cost, order_id) VALUES (%s, %s, %s, %s)"
+    SELECT_BY_ITEM_ID = "SELECT item_name, item_type, cost, order_id FROM order_items WHERE item_id = (%s)"
+    SELECT_BY_ORDER_ID = "SELECT item_id, item_name, item_type, cost FROM order_items WHERE order_id = (%s)"
 
     def __init__(self, data_source):
         self.__data_source = data_source
@@ -128,7 +128,8 @@ class ReportDao(object):
         __data_source (DataSource): an object holding DB connection and configuration.
     """
 
-    SELECT_RECORDS = """SELECT orders.seller_name as seller_name, COUNT(orders.seller_name) as number, SUM(order_items.cost) as value 
+    SELECT_RECORDS = """SELECT orders.seller_name as seller_name, COUNT(orders.seller_name) as number, 
+                        SUM(order_items.cost) as value 
                         FROM orders INNER JOIN order_items on orders.order_id = order_items.order_id 
                         GROUP BY orders.seller_name"""
 
