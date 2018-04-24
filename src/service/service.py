@@ -39,7 +39,6 @@ class OrderService(object):
         logger.info("Trying to make the order bill: {}.".format(order))
         if len(order.get_items()) == 0:
             raise ServiceError("There was an attempt to make the bill without items." + str(order))
-
         order_date = datetime.now().strftime(self.BILL_DATA_FORMAT)
         items_to_string = "\n".join([item.__str__() for item in order.get_items()])
         template_data = {"date": order_date, "user": order.get_user().fullname, "item": items_to_string}
