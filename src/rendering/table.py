@@ -17,6 +17,8 @@ def get_whitespaces(whitespace_number):
 
 
 class ALIGNMENT:
+    """It is a container of alignment type.
+    """
     def __init__(self):
         pass
 

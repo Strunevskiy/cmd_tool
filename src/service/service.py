@@ -28,6 +28,14 @@ class OrderService(object):
         self.__dao_manager = dao_manager
 
     def make_bill(self, order):
+        """It makes the bill from provided order object.
+
+        Args:
+            order (Order): an object from which the bill is created.
+
+        Raises:
+            ServiceError: if provided order does not contain items.
+        """
         logger.info("Trying to make the order bill: {}.".format(order))
         if len(order.get_items()) == 0:
             raise ServiceError("There was an attempt to make the bill without items." + str(order))
@@ -39,13 +47,14 @@ class OrderService(object):
         FileUtil.write(self.BILL_OUTCOME_PATH_TEMPLATE.format(order_date), outcome)
 
     def save(self, order):
-        """It saves details of order in persistent storage.
+        """It saves order in persistent storage in one transaction.
 
         Args:
-            order (Order): an object holding DAO for all business entities.
+            order (Order): an object to save.
 
         Raises:
             ServiceError: if provided order does not contain items.
+            Exception: if order can not be persisted due to exception in dao layer.
         """
         logger.info("Trying to save the order: {}.".format(order))
         if len(order.get_items()) == 0:

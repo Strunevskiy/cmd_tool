@@ -1,5 +1,4 @@
 """This module contains classes that save, delete and retrieve business entities from persistent store."""
-
 from decimal import Decimal
 
 from src.base.entity import ReportRecord, Item, TYPE, Order, User
@@ -22,12 +21,28 @@ class OrderDao(object):
         self.__data_source = data_source
 
     def persist(self, order):
+        """It saves order details in persistent store.
+
+        Args:
+            order (Order): order to persist.
+
+        Returns:
+            int: id of persisted order.
+        """
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.INSERT_ORDER, order.get_user().fullname)
             order_id = cursor.lastrowid
         return order_id
 
     def find_by_id(self, order_id):
+        """It finds order by provided order id.
+
+        Args:
+            order_id (int): id of persisted order.
+
+        Returns:
+            Order: found order by provided order id.
+        """
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.SELECT_BY_ID, order_id)
             row = cursor.fetchone()
@@ -37,6 +52,12 @@ class OrderDao(object):
                 return Order()
 
     def find_all(self):
+        """It finds all the orders in store.
+
+
+        Returns:
+            list: bunch of available orders in store, otherwise empty list.
+        """
         orders = []
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.SELECT_ALL)
@@ -46,6 +67,8 @@ class OrderDao(object):
             return orders
 
     def delete_by_id(self, order_id):
+        """It deletes order by provided order id.
+        """
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.DELETE_BY_ID, order_id)
 
@@ -65,6 +88,15 @@ class ItemDao(object):
         self.__data_source = data_source
 
     def persist(self, item, order_id):
+        """It saves item in persistent store that is related to order id.
+
+        Args:
+            item (Item): item to persist.
+            order_id (int): order id that item belongs to.
+
+        Returns:
+            int: persisted item id
+        """
         with self.__data_source.get_connection().cursor() as cursor:
             params = (item.get_name(), item.get_item_type(), item.get_cost(), order_id)
             cursor.execute(self.INSERT_ITEM, params)
@@ -72,6 +104,14 @@ class ItemDao(object):
             return item_id
 
     def find_by_id(self, item_id):
+        """It finds item by provided item id.
+
+        Args:
+            item_id (int): id of persisted item.
+
+        Returns:
+            Item: found item by provided item id, otherwise empty item
+        """
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.SELECT_BY_ITEM_ID, item_id)
             row = cursor.fetchone()
@@ -96,6 +136,11 @@ class ReportDao(object):
         self.__data_source = data_source
 
     def get_sales_records(self):
+        """It executes an aggregation query and returns bunch of ReportRecord object.
+
+        Returns:
+            list: bunch of ReportRecord object
+        """
         records = []
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.SELECT_RECORDS)
@@ -106,13 +151,13 @@ class ReportDao(object):
 
 
 class DaoManager(object):
-    """It holds all of the DAO.
+    """It holds all of the DAO allowing to do operations from different DAO in one transaction.
 
     Attributes:
-        __data_source (DataSource): an object holding DB connection and configuration.
-        __item_dao (ItemDao):
-        __order_dao (OrderDao):
-        __report_dao (ReportDao):
+        __data_source (DataSource): an object holding DB configuration and connection.
+        __item_dao (ItemDao): an object providing access to item
+        __order_dao (OrderDao): an object providing access to order
+        __report_dao (ReportDao): an object providing access to sales figures
     """
 
     def __init__(self, data_source):
@@ -122,24 +167,43 @@ class DaoManager(object):
         self.__report_dao = None
 
     def get_item_dao(self):
+        """It initializes ItemDao if has not been initialized yet and returns it.
+
+        Returns:
+            ItemDao:
+        """
         if self.__item_dao is None:
             self.__item_dao = ItemDao(self.__data_source)
         return self.__item_dao
 
     def get_order_dao(self):
+        """It initializes OrderDao if has not been initialized yet and returns it.
+
+        Returns:
+            OrderDao:
+        """
         if self.__order_dao is None:
             self.__order_dao = OrderDao(self.__data_source)
         return self.__order_dao
 
     def get_report_dao(self):
+        """It initializes ReportDao if has not been initialized yet and returns it.
+
+        Returns:
+            ReportDao:
+        """
         if self.__report_dao is None:
             self.__report_dao = ReportDao(self.__data_source)
         return self.__report_dao
 
     def close_connection(self):
+        """It closes DB connection.
+        """
         self.__data_source.close()
 
     def commit(self):
+        """It commits changes to DB.
+        """
         self.__data_source.commit()
 
 
@@ -149,25 +213,36 @@ ingredients_section = "INGREDIENT"
 
 
 class ItemDaoFile(object):
+    """It works with persistent store to retrieve item available to salesman.
+
+    Attributes:
+        __property_util (PropertyUtil): Interface allowing to work with persistent store.
+    """
 
     def __init__(self):
         self.__property_util = PropertyUtil()
 
     def find_all_by_type(self, item_type):
+        """It finds all the available items by provided item type.
+
+        Args:
+            item_type (str): item type of item to obtain.
+
+        Returns:
+            list: found items by provided item_type, otherwise empty list
+        """
         records = self.__property_util.get_entries(menu_storage_path, item_type.upper());
         items = []
         for name, cost in records:
             items.append(Item(name, Decimal(cost), item_type))
         return items
 
-    def is_present(self, item):
-        items = self.find_all_by_type(item.get_item_type())
-        for name, cost in items:
-            if name == item.item.get_name():
-                return True
-        return False
-
     def find_all(self):
+        """It obtains all the available items.
+
+        Returns:
+            list: all the available items.
+        """
         all_items = []
         all_items.extend(self.find_all_by_type(TYPE.BEVERAGE))
         all_items.extend(self.find_all_by_type(TYPE.ADDITION))

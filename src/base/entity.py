@@ -1,10 +1,16 @@
 """This module is made up of classes that represent business entities."""
-
-
 from decimal import Decimal
 
 
 def round_cost(cost):
+    """It rounds cost of item up to 4 digits.
+
+    Args:
+        cost (Decimal): cost of item
+
+    Returns:
+        Decimal: rounded cost of item up to 4 digits
+    """
     return round(cost, 4)
 
 
@@ -20,10 +26,10 @@ class Item(object):
     """Representation of a item being sold.
 
     Attributes:
-        __name (str):
-        __cost (Decimal):
-        __item_type (TYPE):
-        __item_id (int):
+        __name (str): item name
+        __cost (Decimal): item cost
+        __item_type (TYPE): item type, beverage or ingredient
+        __item_id (int): id of persisted item in store
     """
 
     def __init__(self, name="", cost=0, item_type="", item_id=0):
@@ -86,9 +92,9 @@ class User(object):
     """Representation of an application user.
 
     Attributes:
-        __first_name (str):
-        __last_name (str):
-        __position (POSITION):
+        __first_name (str): first name of user
+        __last_name (str): last name of user
+        __position (POSITION): position of user, salesman or manager
     """
 
     def __init__(self, first_name="", last_name="", position=""):
@@ -140,9 +146,9 @@ class Order(object):
     """Representation of order being submitted by user.
 
     Attributes:
-        __user (str):
-        __order_id (int):
-        __item_bunch (list):
+        __user (str): user by who the order was created
+        __order_id (int): id of persisted order in store
+        __item_bunch (list): items of created order
     """
 
     def __init__(self, user, order_id=0):
@@ -179,9 +185,9 @@ class ReportRecord(object):
     """Representation of report record being reported.
 
     Attributes:
-        __fullname (str):
-        __sales_number (int):
-        __sales_value (Decimal):
+        __fullname (str): fullname of salesman
+        __sales_number (int): sales number
+        __sales_value (Decimal): sales value
     """
 
     def __init__(self, fullname, sales_number, sales_value):
