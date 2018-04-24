@@ -19,8 +19,6 @@ def main():
     args = parser.parse_args()
 
     prompt = BasePrompt.get_prompt(User(args.first_name, args.last_name, args.position))
-    prompt.prompt = ">>"
-
     command_line = " ".join(args.command)
     if args.mode == "command_line":
         prompt.onecmd(command_line)

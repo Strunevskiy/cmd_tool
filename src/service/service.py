@@ -2,7 +2,7 @@
 import logging
 
 from decimal import Decimal
-from time import strftime, gmtime
+from datetime import datetime
 
 from src.base.entity import round_cost
 from .exception import ServiceError
@@ -40,7 +40,7 @@ class OrderService(object):
         if len(order.get_items()) == 0:
             raise ServiceError("There was an attempt to make the bill without items." + str(order))
 
-        order_date = strftime(self.BILL_DATA_FORMAT, gmtime())
+        order_date = datetime.now().strftime(self.BILL_DATA_FORMAT)
         items_to_string = "\n".join([item.__str__() for item in order.get_items()])
         template_data = {"date": order_date, "user": order.get_user().fullname, "item": items_to_string}
         outcome = TemplateUtil.process(self.BILL_TEMPLATE_PATH, template_data)

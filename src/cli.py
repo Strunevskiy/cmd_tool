@@ -10,8 +10,12 @@ from src.service.service import OrderService, ReportService
 from src.store.dao import DaoManager, ItemDaoFile
 from src.store.db import DataSource
 
+logger = logging.getLogger()
+
 
 class BasePrompt(Cmd):
+    # intro = "Welcome to the coffee for mee shell.\nType help or ? to list commands.\n"
+    prompt = ">>"
 
     def __init__(self, user):
         Cmd.__init__(self)
@@ -51,7 +55,6 @@ class BasePrompt(Cmd):
 
 
 class SalesmanPrompt(BasePrompt):
-    __log = logging.getLogger()
 
     __available_item_types = ["beverage", "ingredient"]
 
@@ -62,7 +65,7 @@ class SalesmanPrompt(BasePrompt):
         self.__order_service = OrderService(self.get_dao_manager())
 
     def do_show(self, arg):
-        self.__log.info("Command show was invoked with arg: {}".format(arg))
+        logger.info("Command show was invoked with arg: {}".format(arg))
         if arg in self.__available_item_types:
             if arg == self.__available_item_types[0]:
                 items = self.__item_dao_file.find_all_by_type(TYPE.BEVERAGE)
@@ -72,11 +75,11 @@ class SalesmanPrompt(BasePrompt):
                 for item in items:
                     print(item.get_name())
             else:
-                self.__log.info("No items were found for {}.".format(arg))
+                logger.info("No items were found for {}.".format(arg))
                 print("Nothing is available for {}.".format(arg))
         else:
-            self.__log.info("The arg show command was invoked is incorrect.")
-            self.__log.info("The available args: " + ", ".join(self.__available_item_types))
+            logger.info("The arg show command was invoked is incorrect.")
+            logger.info("The available args: " + ", ".join(self.__available_item_types))
             print("Command show was invoked with incorrect args.")
             self.help_show()
 
@@ -85,41 +88,41 @@ class SalesmanPrompt(BasePrompt):
         print("Available args: " + ", ".join(self.__available_item_types))
 
     def do_price(self, arg):
-        self.__log.info("Command price was invoked.")
-        self.__log.info("Available item types: " + ", ".join(self.__available_item_types))
+        logger.info("Command price was invoked.")
+        logger.info("Available item types: " + ", ".join(self.__available_item_types))
         for arg in self.__available_item_types:
-            self.__log.info("Requesting items related to: " + arg)
+            logger.info("Requesting items related to: " + arg)
             items = self.__item_dao_file.find_all_by_type(arg)
-            self.__log.info("Requested items: " + ", ".join([item.__repr__() for item in items]))
-            self.__log.info("Printing items for user.")
+            logger.info("Requested items: " + ", ".join([item.__repr__() for item in items]))
+            logger.info("Printing items for user.")
             for item in items:
                 print(item)
-            self.__log.info("Completed printing items for user.")
+                logger.info("Completed printing items for user.")
 
     def help_price(self, arg):
         print("Show price for: " + ", ".join(self.__available_item_types))
         print("No args are required.")
 
     def do_submit_order(self, arg):
-        self.__log.info("Command submit_order was invoked")
-        self.__log.info("Order to be submitted: {}".format(str(self.__order)))
+        logger.info("Command submit_order was invoked")
+        logger.info("Order to be submitted: {}".format(str(self.__order)))
         try:
-            self.__log.info("Creating the bill from the order.")
+            logger.info("Creating the bill from the order.")
             self.__order_service.make_bill(self.__order)
-            self.__log.info("The bill from the order was created.")
+            logger.info("The bill from the order was created.")
 
-            self.__log.info("Persisting data of the order.")
+            logger.info("Persisting data of the order.")
             self.__order_service.save(self.__order)
-            self.__log.info("The data of the order was persisted.")
+            logger.info("The data of the order was persisted.")
         except ServiceError as e:
-            self.__log.exception(e)
+            logger.exception(e)
             print("Order was not submitted due to order service not being able to handle the order.")
             print("The possible root cause: " + str(e))
         except Exception as e:
-            self.__log.exception(e)
+            logger.exception(e)
             print("Order was not submitted due to unexpected things.")
         else:
-            self.__log.info("Order was submitted successfully. Order: {}".format(str(self.__order)))
+            logger.info("Order was submitted successfully. Order: {}".format(str(self.__order)))
             print("Order was submitted successfully.")
         finally:
             self.__order = None
@@ -129,14 +132,14 @@ class SalesmanPrompt(BasePrompt):
         print("No args are required.")
 
     def do_add_items(self, arg):
-        self.__log.info("Command add_item was invoked.")
+        logger.info("Command add_item was invoked.")
 
         requested_items = arg.split(" ")
-        self.__log.info("Items requested to be added to the order: " + ", ".join(requested_items))
+        logger.info("Items requested to be added to the order: " + ", ".join(requested_items))
 
         if len(requested_items) == 0:
             print("No args were specified.")
-            self.help_add_item()
+            self.help_add_items()
             return
 
         available_items = self.__item_dao_file.find_all()
@@ -151,41 +154,41 @@ class SalesmanPrompt(BasePrompt):
         not_found_items = [requested_item for requested_item in requested_items if requested_item not in order_items_names]
 
         if len(not_found_items) == 0:
-            self.__log.info("All requested items were found and are ready to be added to the order.")
-            self._create_order()
+            logger.info("All requested items were found and are ready to be added to the order.")
+            self.__create_order()
             self.__order.add_items(*order_items)
-            self.__log.info("Requested items were added to the order.")
+            logger.info("Requested items were added to the order.")
             print("Provided beverage or ingredient was added to the order.")
         else:
             not_found_items_str = ", ".join(not_found_items)
-            self.__log.info("Requested items were not added to the order because of some not being found: " + not_found_items_str)
+            logger.info("Requested items were not added to the order because of some not being found: " + not_found_items_str)
             print("Specified beverage or ingredient was not added to the order because of some not being found: " + not_found_items_str)
-            self.help_add_item_to_order()
+            self.help_add_items()
 
     def help_add_items(self):
         print("Command add_item can be invoked with args.")
         print("Args are list of beverage or ingredient names passed vie whitespace.")
 
     def do_clean(self, arg):
-        self.__log.info("Command clean was invoked.")
+        logger.info("Command clean was invoked.")
         if self.__order is not None:
             self.__order.clean_item_bunch()
-            self.__log.info("Order was cleaned.")
+            logger.info("Order was cleaned.")
             print("Order was cleaned.")
         else:
-            self.__log.info("Command clean was invoked on not created order.")
+            logger.info("Command clean was invoked on not created order.")
             print("Order was not created yet.")
 
     def help_clean(self):
         print("Clean created order.")
         print("No args are required.")
 
-    def _create_order(self):
+    def __create_order(self):
         if self.__order is None:
             self.__order = Order(self.get_user())
-            self.__log.info("Order was created.")
+            logger.info("Order was created.")
         else:
-            self.__log.info("Order has been already created.")
+            logger.info("Order has been already created.")
 
 
 class ManagerPrompt(BasePrompt):
@@ -198,20 +201,20 @@ class ManagerPrompt(BasePrompt):
         self.__reporter_service = ReportService(self.get_dao_manager())
 
     def do_generate_report(self, arg):
-        self.__log.info("Command generate_report was invoked with arg: {}.".format(arg))
+        logger.info("Command generate_report was invoked with arg: {}.".format(arg))
         if arg in self._available_args_gen_report:
             try:
                 if arg == self._available_args_gen_report[0]:
-                    self.__log.info("Generating report into console.")
+                    logger.info("Generating report into console.")
                     self.__reporter_service.report(ConsoleExporter())
                 elif arg == self._available_args_gen_report[1]:
-                    self.__log.info("Generating report into CSV.")
+                    logger.info("Generating report into CSV.")
                     self.__reporter_service.report(CSVExporter())
             except Exception as e:
-                self.__log.exception(e)
+                logger.exception(e)
                 print("Report was not generated due to unexpected things.")
             else:
-                self.__log.info("Report was generated successfully")
+                logger.info("Report was generated successfully")
         else:
             print("Command was invoked with incorrect arg.")
             self.help_generate_report()
