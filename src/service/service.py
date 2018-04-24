@@ -38,7 +38,7 @@ class OrderService(object):
         """
         logger.info("Trying to make the order bill: {}.".format(order))
         if order is None or len(order.get_items()) == 0:
-            raise ServiceError("There was an attempt to make the bill without items." + str(order))
+            raise ServiceError("There was an attempt to save invalid order." + str(order))
         order_date = datetime.now().strftime(self.BILL_DATA_FORMAT)
         items_to_string = "\n".join([item.__str__() for item in order.get_items()])
         template_data = {"date": order_date, "user": order.get_user().fullname, "item": items_to_string}
@@ -57,7 +57,7 @@ class OrderService(object):
         """
         logger.info("Trying to save the order: {}.".format(order))
         if order is None or len(order.get_items()) == 0:
-            raise ServiceError("There was an attempt to save the order without items." + str(order))
+            raise ServiceError("There was an attempt to save invalid order." + str(order))
         try:
             logger.info("Persisting the order: {}.".format(order))
             order_id = self.__dao_manager.get_order_dao().persist(order)
