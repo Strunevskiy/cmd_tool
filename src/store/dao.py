@@ -1,8 +1,11 @@
 """This module contains classes that save, delete and retrieve business entities from persistent store."""
+import logging
 from decimal import Decimal
 
 from src.base.entity import ReportRecord, Item, TYPE, Order, User
 from src.utils.file import PropertyUtil
+
+logger = logging.getLogger()
 
 
 class OrderDao(object):
@@ -29,9 +32,11 @@ class OrderDao(object):
         Returns:
             int: id of persisted order.
         """
+        logger.info("Persisting order: " + repr(order))
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.INSERT_ORDER, order.get_user().fullname)
             order_id = cursor.lastrowid
+        logger.info("Persisted order id: " + str(order_id))
         return order_id
 
     def find_by_id(self, order_id):
@@ -43,13 +48,16 @@ class OrderDao(object):
         Returns:
             Order: found order by provided order id.
         """
+        logger.info("Looking for order by id: " + str(order_id))
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.SELECT_BY_ID, order_id)
             row = cursor.fetchone()
             if row is not None:
+                logger.info("Order was found.")
                 return Order(User().from_string(row.get("seller_name")))
             else:
-                return Order()
+                logger.info("Order was not found.")
+                return Order(User())
 
     def find_all(self):
         """It finds all the orders in store.
@@ -58,19 +66,23 @@ class OrderDao(object):
         Returns:
             list: bunch of available orders in store, otherwise empty list.
         """
+        logger.info("Looking for all existing orders.")
         orders = []
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.SELECT_ALL)
             data = cursor.fetchall()
             for row in data:
                 orders.append(Order(User().from_string(row.get("seller_name")), row.get("order_id")))
-            return orders
+        logger.info("There was found the following number of orders: " + str(len(orders)))
+        return orders
 
     def delete_by_id(self, order_id):
         """It deletes order by provided order id.
         """
+        logger.info("Deleting the order that has id: " + str(order_id))
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.DELETE_BY_ID, order_id)
+        logger.info("The order was removed from persistent store.")
 
 
 class ItemDao(object):
@@ -97,11 +109,14 @@ class ItemDao(object):
         Returns:
             int: persisted item id
         """
+        logger.info("Order id of persisted item: " + str(order_id))
+        logger.info("Persisting item: " + repr(item))
         with self.__data_source.get_connection().cursor() as cursor:
             params = (item.get_name(), item.get_item_type(), item.get_cost(), order_id)
             cursor.execute(self.INSERT_ITEM, params)
             item_id = cursor.lastrowid
-            return item_id
+        logger.info("Persisted item id: " + str(item_id))
+        return item_id
 
     def find_by_id(self, item_id):
         """It finds item by provided item id.
@@ -112,12 +127,15 @@ class ItemDao(object):
         Returns:
             Item: found item by provided item id, otherwise empty item
         """
+        logger.info("Looking for item by item id: " + str(item_id))
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.SELECT_BY_ITEM_ID, item_id)
             row = cursor.fetchone()
             if row is not None:
+                logger.info("The item was found.")
                 return Item(row.get("item_name"), row.get("cost"), row.get("item_type"), item_id)
             else:
+                logger.info("The item was not found.")
                 return Item()
 
 
@@ -142,13 +160,15 @@ class ReportDao(object):
         Returns:
             list: bunch of ReportRecord object
         """
+        logger.info("Collecting sales figures.")
         records = []
         with self.__data_source.get_connection().cursor() as cursor:
             cursor.execute(self.SELECT_RECORDS)
             data = cursor.fetchall()
             for row in data:
                 records.append(ReportRecord(row.get("seller_name"), row.get("number"), row.get("value")))
-            return records
+        logger.info("The number of sales figures was collected.")
+        return records
 
 
 class DaoManager(object):
@@ -171,7 +191,7 @@ class DaoManager(object):
         """It initializes ItemDao if has not been initialized yet and returns it.
 
         Returns:
-            ItemDao:
+            ItemDao: an object responsible for providing access to items in DB.
         """
         if self.__item_dao is None:
             self.__item_dao = ItemDao(self.__data_source)
@@ -181,7 +201,7 @@ class DaoManager(object):
         """It initializes OrderDao if has not been initialized yet and returns it.
 
         Returns:
-            OrderDao:
+            OrderDao: an object responsible for providing access to orders in DB.
         """
         if self.__order_dao is None:
             self.__order_dao = OrderDao(self.__data_source)
@@ -191,7 +211,7 @@ class DaoManager(object):
         """It initializes ReportDao if has not been initialized yet and returns it.
 
         Returns:
-            ReportDao:
+            ReportDao: an object responsible for providing access to report records in DB.
         """
         if self.__report_dao is None:
             self.__report_dao = ReportDao(self.__data_source)
@@ -232,7 +252,9 @@ class ItemDaoFile(object):
         Returns:
             list: found items by provided item_type, otherwise empty list
         """
-        records = self.__property_util.get_entries(menu_storage_path, item_type.upper());
+        logger.info("Extracting items from a file store of type: " + item_type)
+        records = self.__property_util.get_entries(menu_storage_path, item_type.upper())
+        logger.info("There was found the following number: " + str(len(records)))
         items = []
         for name, cost in records:
             items.append(Item(name, Decimal(cost), item_type))

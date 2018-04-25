@@ -15,6 +15,9 @@ def round_cost(cost):
 
 
 class TYPE:
+    """It is holder class of item type being sold.
+    """
+
     def __init__(self):
         pass
 
@@ -81,6 +84,9 @@ class Item(object):
 
 
 class POSITION:
+    """It is holder class of application user type.
+    """
+
     def __init__(self):
         pass
 

@@ -114,7 +114,7 @@ class ResizableTable(object):
         __col_sep (list): a string representing a symbol for separating columns in table.
     """
 
-    def __init__(self, padding_left, padding_right, alignment, header, body=[], footer=[], col_sep="|"):
+    def __init__(self, padding_left, padding_right, alignment, header, body=(), footer=(), col_sep="|"):
         self.__padding_left = padding_left
         self.__padding_right = padding_right
         self.__alignment = alignment
@@ -144,7 +144,7 @@ class ResizableTable(object):
                 table_rep = self.__padding_left.add_padding(column_index, table_rep)
                 table_rep = self.__alignment.make(column_index, item, max_len_in_columns[column_index], table_rep)
                 table_rep = self.__padding_right.add_padding(column_index, table_rep)
-            table_rep = table_rep + "\n"
+            table_rep += "\n"
         return table_rep
 
     def __get_max_len_in_columns(self, table):
@@ -166,7 +166,9 @@ class ResizableTable(object):
         return len(rows_size) == 1
 
     def __form_table(self):
-        table = [self.__header]
+        table = []
+        if self.__header is not None and len(self.__header) != 0:
+            table.append(self.__header)
         if len(self.__body) != 0:
             table.extend(self.__body)
         if len(self.__footer) != 0:

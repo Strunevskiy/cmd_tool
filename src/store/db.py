@@ -1,3 +1,4 @@
+"""This module holds classes of configuring DB connection."""
 import logging
 
 import pymysql
@@ -62,4 +63,4 @@ class DataSource(object):
         if self.__connection is not None:
             self.__connection.commit()
         else:
-            self.__log.error("commit was not done because connection is None")
+            logger.error("commit was not done because connection is None")

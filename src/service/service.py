@@ -39,11 +39,20 @@ class OrderService(object):
         logger.info("Trying to make the order bill: {}.".format(order))
         if order is None or len(order.get_items()) == 0:
             raise ServiceError("There was an attempt to save invalid order." + str(order))
+
         order_date = datetime.now().strftime(self.BILL_DATA_FORMAT)
+        bill_location = self.BILL_OUTCOME_PATH_TEMPLATE.format(order_date)
+
         items_to_string = "\n".join([item.__str__() for item in order.get_items()])
         template_data = {"date": order_date, "user": order.get_user().fullname, "item": items_to_string}
-        outcome = TemplateUtil.process(self.BILL_TEMPLATE_PATH, template_data)
-        FileUtil.write(self.BILL_OUTCOME_PATH_TEMPLATE.format(order_date), outcome)
+
+        logger.info("Starting making the order bill")
+        bill = TemplateUtil.process(self.BILL_TEMPLATE_PATH, template_data)
+        logger.debug("The bill representation: \n" + bill)
+
+        logger.info("The order bill is being written to: " + bill_location)
+        FileUtil.write(bill_location, bill)
+        logger.info("The bill was successfully created")
 
     def save(self, order):
         """It saves order in persistent storage in one transaction.

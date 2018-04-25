@@ -26,4 +26,5 @@ def main():
         prompt.cmdloop(command_line)
 
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    main()
