@@ -34,7 +34,7 @@ class OrderDao(object):
         """
         logger.info("Persisting order: " + repr(order))
         with self.__data_source.get_connection().cursor() as cursor:
-            cursor.execute(self.INSERT_ORDER, order.get_user().fullname)
+            cursor.execute(self.INSERT_ORDER, order.user.fullname)
             order_id = cursor.lastrowid
         logger.info("Persisted order id: " + str(order_id))
         return order_id
@@ -112,7 +112,7 @@ class ItemDao(object):
         logger.info("Order id of persisted item: " + str(order_id))
         logger.info("Persisting item: " + repr(item))
         with self.__data_source.get_connection().cursor() as cursor:
-            params = (item.get_name(), item.get_item_type(), item.get_cost(), order_id)
+            params = (item.name, item.item_type, item.cost, order_id)
             cursor.execute(self.INSERT_ITEM, params)
             item_id = cursor.lastrowid
         logger.info("Persisted item id: " + str(item_id))
@@ -187,7 +187,8 @@ class DaoManager(object):
         self.__order_dao = None
         self.__report_dao = None
 
-    def get_item_dao(self):
+    @property
+    def item_dao(self):
         """It initializes ItemDao if has not been initialized yet and returns it.
 
         Returns:
@@ -197,7 +198,8 @@ class DaoManager(object):
             self.__item_dao = ItemDao(self.__data_source)
         return self.__item_dao
 
-    def get_order_dao(self):
+    @property
+    def order_dao(self):
         """It initializes OrderDao if has not been initialized yet and returns it.
 
         Returns:
@@ -207,7 +209,8 @@ class DaoManager(object):
             self.__order_dao = OrderDao(self.__data_source)
         return self.__order_dao
 
-    def get_report_dao(self):
+    @property
+    def report_dao(self):
         """It initializes ReportDao if has not been initialized yet and returns it.
 
         Returns:

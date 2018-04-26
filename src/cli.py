@@ -51,7 +51,8 @@ class BasePrompt(Cmd):
         Cmd(self).default(line)
         self.do_help("help")
 
-    def get_user(self):
+    @property
+    def user(self):
         """It returns user by who the application was started.
 
         Returns:
@@ -59,7 +60,8 @@ class BasePrompt(Cmd):
         """
         return self.__user
 
-    def get_dao_manager(self):
+    @property
+    def dao_manager(self):
         """It returns initialized dao manager.
 
         Returns:
@@ -87,9 +89,9 @@ class BasePrompt(Cmd):
         Returns:
             BasePrompt: ManagerPrompt or SalesmanPrompt depending on passed user.
         """
-        if user.get_position() == POSITION.SALESMAN:
+        if user.position == POSITION.SALESMAN:
             return SalesmanPrompt(user)
-        elif user.get_position() == POSITION.MANAGER:
+        elif user.position == POSITION.MANAGER:
             return ManagerPrompt(user)
         else:
             return None
@@ -110,7 +112,7 @@ class SalesmanPrompt(BasePrompt):
         BasePrompt.__init__(self, user)
         self.__order = None
         self.__item_dao_file = ItemDaoFile()
-        self.__order_service = OrderService(self.get_dao_manager())
+        self.__order_service = OrderService(self.dao_manager)
 
     def do_show(self, arg):
         """It shows all the available items being sold by a requested type.
@@ -126,7 +128,7 @@ class SalesmanPrompt(BasePrompt):
                 items = self.__item_dao_file.find_all_by_type(TYPE.ADDITION)
             if len(items) != 0:
                 for item in items:
-                    print(item.get_name())
+                    print(item.name)
             else:
                 logger.info("No items were found for {}.".format(arg))
                 print("Nothing is available for {}.".format(arg))
@@ -226,7 +228,7 @@ class SalesmanPrompt(BasePrompt):
 
         if len(requested_items) == 0:
             print("No args were specified.")
-            self.help_add_items()
+            self.help_add_items(args)
             return
 
         available_items = self.__item_dao_file.find_all()
@@ -234,10 +236,10 @@ class SalesmanPrompt(BasePrompt):
         order_items = []
         for requested_item in requested_items:
             for available_item in available_items:
-                if requested_item.lower().strip() == available_item.get_name().lower():
+                if requested_item.lower().strip() == available_item.name.lower():
                     order_items.append(available_item)
 
-        order_items_names = [order_item.get_name() for order_item in order_items]
+        order_items_names = [order_item.name for order_item in order_items]
         not_found_items = [requested_item for requested_item in requested_items if requested_item not in order_items_names]
 
         if len(not_found_items) == 0:
@@ -250,7 +252,7 @@ class SalesmanPrompt(BasePrompt):
             not_found_items_str = ", ".join(not_found_items)
             logger.info("Requested items were not added to the order because of some not being found: " + not_found_items_str)
             print("Specified beverage or ingredient was not added to the order because of some not being found: " + not_found_items_str)
-            self.help_add_items()
+            self.help_add_items(args)
 
     def help_add_items(self, args):
         """It shows a help message for the add_items command.
@@ -287,7 +289,7 @@ class SalesmanPrompt(BasePrompt):
 
     def __create_order(self):
         if self.__order is None:
-            self.__order = Order(self.get_user())
+            self.__order = Order(self.user)
             logger.info("Order was created.")
         else:
             logger.info("Order has been already created.")
@@ -304,7 +306,7 @@ class ManagerPrompt(BasePrompt):
 
     def __init__(self, user):
         BasePrompt.__init__(self, user)
-        self.__reporter_service = ReportService(self.get_dao_manager())
+        self.__reporter_service = ReportService(self.dao_manager)
 
     def do_generate_report(self, arg):
         """It generates reports based on sales figures to depending on passed arg.

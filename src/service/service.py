@@ -37,14 +37,14 @@ class OrderService(object):
             ServiceError: if provided order does not contain items.
         """
         logger.info("Trying to make the order bill: {}.".format(order))
-        if order is None or len(order.get_items()) == 0:
+        if order is None or len(order.items) == 0:
             raise ServiceError("There was an attempt to save invalid order." + str(order))
 
         order_date = datetime.now().strftime(self.BILL_DATA_FORMAT)
         bill_location = self.BILL_OUTCOME_PATH_TEMPLATE.format(order_date)
 
-        items_to_string = "\n".join([item.__str__() for item in order.get_items()])
-        template_data = {"date": order_date, "user": order.get_user().fullname, "item": items_to_string}
+        items_to_string = "\n".join([item.__str__() for item in order.items])
+        template_data = {"date": order_date, "user": order.user.fullname, "item": items_to_string}
 
         logger.info("Starting making the order bill")
         bill = TemplateUtil.process(self.BILL_TEMPLATE_PATH, template_data)
@@ -65,15 +65,15 @@ class OrderService(object):
             Exception: if order can not be persisted due to exception in dao layer.
         """
         logger.info("Trying to save the order: {}.".format(order))
-        if order is None or len(order.get_items()) == 0:
+        if order is None or len(order.items) == 0:
             raise ServiceError("There was an attempt to save invalid order." + str(order))
         try:
             logger.info("Persisting the order: {}.".format(order))
-            order_id = self.__dao_manager.get_order_dao().persist(order)
+            order_id = self.__dao_manager.order_dao.persist(order)
             logger.info("The order was persisted with order id: " + str(order_id))
-            for item in order.get_items():
+            for item in order.items:
                 logger.info("Persisting the item: {}.".format(item))
-                item_id = self.__dao_manager.get_item_dao().persist(item, order_id)
+                item_id = self.__dao_manager.item_dao.persist(item, order_id)
                 logger.info("The item was persisted with item id: " + str(item_id))
         except Exception as e:
             raise e
@@ -108,7 +108,7 @@ class ReportService(object):
         """
         try:
             logger.info("Extracting sales records from db.")
-            records = self.__dao_manager.get_report_dao().get_sales_records()
+            records = self.__dao_manager.report_dao.get_sales_records()
         except Exception as e:
             raise e
         else:
@@ -119,11 +119,11 @@ class ReportService(object):
         total_values = 0.0000
         export_data = []
         for record in records:
-            sales_number = record.get_sales_number()
-            sales_value = record.get_sales_value()
+            sales_number = record.sales_number
+            sales_value = record.sales_value
             total_sales = total_sales + sales_number
             total_values = Decimal(total_values) + Decimal(sales_value)
-            export_data.append((record.get_fullname(), str(sales_number), str(sales_value)))
+            export_data.append((record.fullname, str(sales_number), str(sales_value)))
         logger.debug("Sales data: \n %s", export_data)
         logger.debug("Total sales: %s. Total cost: %s", total_sales, round_cost(total_values))
 

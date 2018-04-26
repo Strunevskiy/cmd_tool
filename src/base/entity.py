@@ -41,28 +41,36 @@ class Item(object):
         self.__item_type = item_type
         self.__item_id = item_id
 
-    def get_name(self):
+    @property
+    def name(self):
         return self.__name
 
-    def set_name(self, name):
+    @name.setter
+    def name(self, name):
         self.__name = name
 
-    def get_cost(self):
+    @property
+    def cost(self):
         return self.__cost
 
-    def set_cost(self, cost):
+    @cost.setter
+    def cost(self, cost):
         self.__cost = cost
 
-    def get_item_type(self):
+    @property
+    def item_type(self):
         return self.__item_type
 
-    def set_item_type(self, item_type):
+    @item_type.setter
+    def item_type(self, item_type):
         self.__item_type = item_type
 
-    def get_item_id(self):
+    @property
+    def item_id(self):
         return self.__item_id
 
-    def set_item_id(self, item_id):
+    @item_id.setter
+    def item_id(self, item_id):
         self.__item_id = item_id
 
     def __key(self):
@@ -74,13 +82,13 @@ class Item(object):
     def __eq__(self, other):
         return (isinstance(other, type(self)) and
                 (self.__name, self.__cost, self.__item_type, self.__item_id)
-                == (other.get_name(), other.get_cost(), other.get_item_type(), other.get_item_id()))
+                == (other.name, other.cost, other.item_type, other.item_id))
 
     def __str__(self):
-        return "name : {}, price : {}, type : {}".format(self.get_name(), str(self.get_cost()), self.get_item_type())
+        return "name : {}, price : {}, type : {}".format(self.name, str(self.cost), self.item_type)
 
     def __repr__(self):
-        return "{} : {} : {}".format(self.get_name(), str(self.get_cost()), self.get_item_type())
+        return "{} : {} : {}".format(self.name, str(self.cost), self.item_type)
 
 
 class POSITION:
@@ -108,23 +116,29 @@ class User(object):
         self.__last_name = last_name
         self.__position = position
 
-    def set_first_name(self, first_name):
-        self.__first_name = first_name
-
-    def set_last_name(self, last_name):
-        self.__last_name = last_name
-
-    def set_position(self, position):
-        self.__position = position
-
-    def get_first_name(self):
+    @property
+    def first_name(self):
         return self.__first_name
 
-    def get_last_name(self):
+    @first_name.setter
+    def first_name(self, first_name):
+        self.__first_name = first_name
+
+    @property
+    def last_name(self):
         return self.__last_name
 
-    def get_position(self):
+    @last_name.setter
+    def last_name(self, last_name):
+        self.__last_name = last_name
+
+    @property
+    def position(self):
         return self.__position
+
+    @position.setter
+    def position(self, position):
+        self.__position = position
 
     @property
     def fullname(self):
@@ -142,7 +156,7 @@ class User(object):
         return cls(first_name=first_name, last_name=last_name, position=position)
 
     def __repr__(self):
-        return "Full name: {}. Position: {}.".format(self.fullname, self.__position)
+        return "Full name: {}. Position: {}.".format(self.fullname, self.position)
 
     def __str__(self):
         return self.fullname
@@ -162,23 +176,28 @@ class Order(object):
         self.__order_id = order_id
         self.__item_bunch = []
 
-    def get_user(self):
+    @property
+    def user(self):
         return self.__user
 
-    def set_user(self, user):
+    @user.setter
+    def user(self, user):
         self.__user = user
 
-    def get_id(self):
+    @property
+    def id(self):
         return self.__order_id
 
-    def set_id(self, order_id):
+    @id.setter
+    def id(self, order_id):
         self.__order_id = order_id
+
+    @property
+    def items(self):
+        return self.__item_bunch
 
     def add_items(self, *args):
         self.__item_bunch.extend(args)
-
-    def get_items(self):
-        return self.__item_bunch
 
     def clean_item_bunch(self):
         self.__item_bunch.clear()
@@ -201,13 +220,16 @@ class ReportRecord(object):
         self.__sales_number = sales_number
         self.__sales_value = round_cost(sales_value)
 
-    def get_fullname(self):
+    @property
+    def fullname(self):
         return self.__fullname
 
-    def get_sales_number(self):
+    @property
+    def sales_number(self):
         return self.__sales_number
 
-    def get_sales_value(self):
+    @property
+    def sales_value(self):
         return self.__sales_value
 
     def __key(self):
@@ -219,7 +241,7 @@ class ReportRecord(object):
     def __eq__(self, other):
         return (isinstance(other, type(self)) and
                 (self.__fullname, self.__sales_number, self.__sales_value) ==
-                (other.get_fullname(), other.get_sales_number(), other.get_sales_value()))
+                (other.fullname, other.sales_number, other.sales_value))
 
     def __repr__(self):
         return "fullname:{},sales:{},value:{}".format(self.__fullname, self.__sales_number, self.__sales_value)

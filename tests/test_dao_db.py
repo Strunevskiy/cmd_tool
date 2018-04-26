@@ -21,26 +21,26 @@ class TestDao(object):
 
     def test_order_dao_insert(self, dao_manager, valid_order):
         try:
-            order_id = dao_manager.get_order_dao().persist(valid_order)
+            order_id = dao_manager.order_dao.persist(valid_order)
         except Exception as e:
             assert False, e
         else:
             dao_manager.commit()
 
         try:
-            order_act = dao_manager.get_order_dao().find_by_id(order_id)
+            order_act = dao_manager.order_dao.find_by_id(order_id)
         except Exception as e:
             assert False, e
 
-        assert order_act.get_user().fullname == valid_order.get_user().fullname, "Persisted order was not found."
+        assert order_act.user.fullname == valid_order.user.fullname, "Persisted order was not found."
 
     def test_item_dao_insert(self, dao_manager, valid_order):
         exp_items = []
         try:
-            order_id = dao_manager.get_order_dao().persist(valid_order)
-            for item in valid_order.get_items():
-                item_id = dao_manager.get_item_dao().persist(item, order_id)
-                item.set_item_id(item_id)
+            order_id = dao_manager.order_dao.persist(valid_order)
+            for item in valid_order.items:
+                item_id = dao_manager.item_dao.persist(item, order_id)
+                item.item_id = item_id
                 exp_items.append(item)
         except Exception as e:
             assert False, e
@@ -50,7 +50,7 @@ class TestDao(object):
         act_items = []
         try:
             for persisted_item in exp_items:
-                item = dao_manager.get_item_dao().find_by_id(persisted_item.get_item_id())
+                item = dao_manager.item_dao.find_by_id(persisted_item.item_id)
                 act_items.append(item)
         except Exception as e:
             assert False, e
@@ -61,9 +61,9 @@ class TestDao(object):
         exp_orders = self.__create_random_orders(amount=2, items=2)
         for order in exp_orders:
             try:
-                order_id = dao_manager.get_order_dao().persist(order)
-                for item in order.get_items():
-                    dao_manager.get_item_dao().persist(item, order_id)
+                order_id = dao_manager.order_dao.persist(order)
+                for item in order.items:
+                    dao_manager.item_dao.persist(item, order_id)
             except Exception as e:
                 assert False, e
             else:
@@ -71,29 +71,29 @@ class TestDao(object):
 
         exp_report_records = []
         for exp_order in exp_orders:
-            fullname = exp_order.get_user().fullname
-            sales_number = len(exp_order.get_items())
+            fullname = exp_order.user.fullname
+            sales_number = len(exp_order.items)
             sales_value = 0.0000
-            for item in exp_order.get_items():
-                sales_value = Decimal(sales_value) + Decimal(item.get_cost())
+            for item in exp_order.items:
+                sales_value = Decimal(sales_value) + Decimal(item.cost)
             exp_report_records.append(ReportRecord(fullname, sales_number, sales_value))
 
         try:
-            act_report_records = dao_manager.get_report_dao().get_sales_records()
+            act_report_records = dao_manager.report_dao.get_sales_records()
         except Exception as e:
             assert False, e
         act_report_records = [act_report_record for act_report_record in act_report_records if
                               act_report_record in exp_report_records]
 
-        exp_report_records.sort(key=lambda x: x.get_sales_value())
-        act_report_records.sort(key=lambda x: x.get_sales_value())
+        exp_report_records.sort(key=lambda x: x.sales_value)
+        act_report_records.sort(key=lambda x: x.sales_value)
 
         assert exp_report_records == act_report_records, "Not all the persisted sales records were returned."
 
     def __delete_orders(self, dao_manager):
-        orders = dao_manager.get_order_dao().find_all()
+        orders = dao_manager.order_dao.find_all()
         for order in orders:
-            dao_manager.get_order_dao().delete_by_id(order.get_id())
+            dao_manager.order_dao.delete_by_id(order.id)
         dao_manager.commit()
 
     def __create_random_orders(self, amount, items):
