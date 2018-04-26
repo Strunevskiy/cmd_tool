@@ -9,8 +9,8 @@ from src.cli import BasePrompt
 
 def main():
     logging.config.fileConfig('./../config/logging.ini')
-    # description a brief description of what the program does and how it works.
-    parser = ArgumentParser(prog="coffee for me", description="coffee")
+
+    parser = ArgumentParser(prog="coffee for me")
     parser.add_argument("first_name", metavar="first_name", help="user first name")
     parser.add_argument("last_name", metavar="last_name", help="user last name")
     parser.add_argument("position", metavar="role", choices=["salesman", "manager"], help="roles: %(choices)s")
