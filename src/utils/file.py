@@ -45,6 +45,7 @@ class FileUtil(object):
     """It reads and writes data from/to file.
 
     """
+
     @staticmethod
     def read_to_string(path_to_file):
         """It reads data from file.
@@ -54,17 +55,9 @@ class FileUtil(object):
 
         Returns:
             str: content of file.
-
-        Raises:
-            Exception: if data from file can not be read due to incorrect file path.
         """
-        try:
-            with open(path_to_file) as file:
-                file_content = file.read()
-        except Exception as e:
-            raise e
-        else:
-            return file_content
+        with open(path_to_file) as file:
+            return file.read()
 
     @staticmethod
     def write(path_to_file, *args):
@@ -73,22 +66,16 @@ class FileUtil(object):
         Args:
             path_to_file (str): path to file to write to.
             args (*args): number of data that should be written to file.
-
-        Raises:
-            Exception: if data can not be written to file due to incorrect file path.
         """
-        try:
-            with open(path_to_file, "w+") as file_to_write:
-                for line in args:
-                    file_to_write.writelines(line)
-        except Exception as e:
-            raise e
+        with open(path_to_file, "w+") as file_to_write:
+            for line in args:
+                file_to_write.writelines(line)
 
 
 class TemplateUtil(object):
     """It works with simple substitute template engine.
-
     """
+
     @staticmethod
     def process(path_to_template, data):
         """It returns result of merging data with template.

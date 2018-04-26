@@ -134,7 +134,7 @@ class SalesmanPrompt(BasePrompt):
             logger.info("The arg show command was invoked is incorrect.")
             logger.info("The available args: " + ", ".join(self.__available_item_types))
             print("Command show was invoked with incorrect args.")
-            self.help_show()
+            self.help_show(arg)
 
     def help_show(self, arg):
         """It shows a help message for the show command.
@@ -331,7 +331,7 @@ class ManagerPrompt(BasePrompt):
                 logger.info("Report was generated successfully")
         else:
             print("Command was invoked with incorrect arg.")
-            self.help_generate_report()
+            self.help_generate_report(arg)
 
     def help_generate_report(self, args):
         """It shows a help message for the generate_report command.

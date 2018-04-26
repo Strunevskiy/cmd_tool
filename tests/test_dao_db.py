@@ -32,7 +32,7 @@ class TestDao(object):
         except Exception as e:
             assert False, e
 
-        assert order_act.get_user().fullname == valid_order.get_user().fullname
+        assert order_act.get_user().fullname == valid_order.get_user().fullname, "Persisted order was not found."
 
     def test_item_dao_insert(self, dao_manager, valid_order):
         exp_items = []
@@ -55,7 +55,7 @@ class TestDao(object):
         except Exception as e:
             assert False, e
 
-        assert act_items == exp_items
+        assert act_items == exp_items, "Persisted items were not found at all or partially."
 
     def test_report_dao_get_sales_record(self, dao_manager):
         exp_orders = self.__create_random_orders(amount=2, items=2)
@@ -88,7 +88,7 @@ class TestDao(object):
         exp_report_records.sort(key=lambda x: x.get_sales_value())
         act_report_records.sort(key=lambda x: x.get_sales_value())
 
-        assert exp_report_records == act_report_records
+        assert exp_report_records == act_report_records, "Not all the persisted sales records were returned."
 
     def __delete_orders(self, dao_manager):
         orders = dao_manager.get_order_dao().find_all()
